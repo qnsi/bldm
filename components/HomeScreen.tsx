@@ -1,16 +1,23 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  Pressable,
+} from "react-native";
 import PocketBase from "pocketbase";
 
 const pb = new PocketBase("http://127.0.0.1:8090");
 
-type Project = {
+export type Project = {
   name: string;
   numberOfTasks: number;
   thumbnail: string;
 };
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const [projects, setProjects] = React.useState<Project[]>([]);
   useEffect(() => {
     pb.collection("projects")
@@ -38,9 +45,17 @@ export default function HomeScreen() {
       <FlatList
         data={projects}
         renderItem={({ item, index }) => (
-          <View style={styles.project}>
-            <Image style={styles.thumbnail} source={{ uri: item.thumbnail }} />
-            <Text style={styles.projectName}>{item.name}</Text>
+          <View>
+            <Pressable
+              style={styles.project}
+              onPress={() => navigation.navigate("Project", item)}
+            >
+              <Image
+                style={styles.thumbnail}
+                source={{ uri: item.thumbnail }}
+              />
+              <Text style={styles.projectName}>{item.name}</Text>
+            </Pressable>
           </View>
         )}
       />
