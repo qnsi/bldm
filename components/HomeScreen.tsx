@@ -7,32 +7,37 @@ import {
   Image,
   Pressable,
 } from "react-native";
-import PocketBase from "pocketbase";
+import { createClient } from "@supabase/supabase-js";
 
-const pb = new PocketBase("http://127.0.0.1:8090");
+const supabase = createClient(
+  "https://okqjlkjppcfdjjmumweh.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rcWpsa2pwcGNmZGpqbXVtd2VoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA4NzAxNDUsImV4cCI6MjAyNjQ0NjE0NX0.QjEDBglODFUU0U7Qg1D1dedr3tgUyPwigihvb7Bp-2Y",
+);
 
 export type Project = {
   name: string;
   numberOfTasks: number;
   thumbnail: string;
+  plans: string[];
 };
 
 export default function HomeScreen({ navigation }) {
   const [projects, setProjects] = React.useState<Project[]>([]);
   useEffect(() => {
-    pb.collection("projects")
-      .getList()
+    supabase
+      .from("projects")
+      .select()
       .then((result) => {
+        console.log("result: ", result);
+        // result:  {"count": null, "data": [{"created_at": "2024-03-19T18:03:44.38948+00:00", "id": 1, "name": "Garwolin", "thumbnail_url": "https://okqjlkjppcfdjjmumweh.supabase.co/storage/v1/object/sign/plan_thumbnails/Garwolin.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJwbGFuX3RodW1ibmFpbHMvR2Fyd29saW4uanBnIiwiaWF0IjoxNzEwODcxMzI5LCJleHAiOjIwMjYyMzEzMjl9.GO-14NIxlxtdcQCvOnGK9G8RuQTxIL7aD8IRKmKFHD0"}], "error": null, "status": 200, "statusText": ""}
+        if (result.data === null) return;
         setProjects(
-          result.items.map((item) => {
-            const url = pb.files.getUrl(item, item.thumbnail, {
-              thumb: "100x250",
-            });
-            console.log("url: ", url);
+          result.data?.map((project) => {
             return {
-              name: item.name,
+              name: project.name,
               numberOfTasks: 0,
-              thumbnail: url,
+              thumbnail: project.thumbnail_url,
+              plans: [],
             } as Project;
           }),
         );
