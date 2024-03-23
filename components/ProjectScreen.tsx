@@ -1,8 +1,10 @@
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions, SafeAreaView } from "react-native";
 import { Project } from "./HomeScreen";
 import React, { useEffect } from "react";
-import Pdf from "react-native-pdf";
 import { createClient } from "@supabase/supabase-js";
+
+import PdfRendererView from "react-native-pdf-renderer";
+import * as FileSystem from "expo-file-system";
 
 type Plan = {
   name: string;
@@ -17,38 +19,48 @@ const supabase = createClient(
 export default function ProjectScreen({ route, navigation }) {
   const project = route.params as Project;
   const [plans, setPlans] = React.useState<Plan[]>([]);
+  const [fileSource, setFileSource] = React.useState<string>();
+
   useEffect(() => {
-    console.log("Does refreshing work?");
-    console.log("project.plans: ", project.plans);
+    console.log("ProjectScreen: useEffect, fetching plans");
     supabase
       .from("plans")
       .select()
       .then((result) => {
-        console.log("Result: ", result);
+        console.log("supabase.from(plans): ", result);
         if (result.data === null) return;
         const firstPlan = result.data[0];
         //  LOG  Result:  {"count": null, "data": [{"created_at": "2024-03-19T18:19:39.053546+00:00", "id": 1, "name": "Garwolin main", "pdf_url": "https://okqjlkjppcfdjjmumweh.supabase.co/storage/v1/object/public/plan_pdfs/garwolin-main.pdf?t=2024-03-19T18%3A18%3A19.287Z", "project_id": 1}], "error": null, "status": 200, "statusText": ""}
         setPlans([{ name: firstPlan.name, pdfUrl: firstPlan.url }]);
+        FileSystem.downloadAsync(
+          firstPlan.url,
+          FileSystem.documentDirectory + "file.pdf",
+        ).then(({ uri }) => {
+          console.log("FileSystem.downloadAsync uri: ", uri);
+          setFileSource(uri);
+        });
       });
   }, [project]);
 
   const PdfResource = {
-    uri: plans[0] ? plans[0].pdfUrl : "",
+    uri: fileSource,
     cache: false,
   };
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <Text>{project.name}</Text>
-      <Pdf
-        trustAllCerts={false}
-        source={PdfResource}
-        style={styles.pdf}
-        onLoadComplete={(numberOfPages, filePath) => {
-          console.log(`number of pages: ${numberOfPages}`);
+      <PdfRendererView
+        style={{ backgroundColor: "white" }}
+        source={fileSource}
+        distanceBetweenPages={16}
+        maxZoom={2}
+        singlePage={true}
+        onPageChange={(current, total) => {
+          console.log("onPageChange", { current, total });
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

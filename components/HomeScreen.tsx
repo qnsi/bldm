@@ -24,11 +24,11 @@ export type Project = {
 export default function HomeScreen({ navigation }) {
   const [projects, setProjects] = React.useState<Project[]>([]);
   useEffect(() => {
+    console.log("HomeScreen: useEffect fetching projects");
     supabase
       .from("projects")
       .select()
       .then((result) => {
-        console.log("result: ", result);
         // result:  {"count": null, "data": [{"created_at": "2024-03-19T18:03:44.38948+00:00", "id": 1, "name": "Garwolin", "thumbnail_url": "https://okqjlkjppcfdjjmumweh.supabase.co/storage/v1/object/sign/plan_thumbnails/Garwolin.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJwbGFuX3RodW1ibmFpbHMvR2Fyd29saW4uanBnIiwiaWF0IjoxNzEwODcxMzI5LCJleHAiOjIwMjYyMzEzMjl9.GO-14NIxlxtdcQCvOnGK9G8RuQTxIL7aD8IRKmKFHD0"}], "error": null, "status": 200, "statusText": ""}
         if (result.data === null) return;
         setProjects(
