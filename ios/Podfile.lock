@@ -88,6 +88,8 @@ PODS:
     - React-NativeModulesApple
     - React-RCTAppDelegate
     - ReactCommon/turbomodule/core
+  - ExpoPdfViewer (1.0.0):
+    - ExpoModulesCore
   - EXUpdatesInterface (0.15.3)
   - FBLazyVector (0.73.2)
   - FBReactNativeSpec (0.73.2):
@@ -1145,8 +1147,6 @@ PODS:
     - React-jsi (= 0.73.2)
     - React-logger (= 0.73.2)
     - React-perflogger (= 0.73.2)
-  - ReactNativePdfRenderer (1.2.0):
-    - React-Core
   - RNGestureHandler (2.15.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1173,6 +1173,7 @@ DEPENDENCIES:
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
+  - ExpoPdfViewer (from `../modules/expo-pdf-viewer/ios`)
   - EXUpdatesInterface (from `../node_modules/expo-updates-interface/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
@@ -1224,7 +1225,6 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - ReactNativePdfRenderer (from `../node_modules/react-native-pdf-renderer`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -1264,6 +1264,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-keep-awake/ios"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core"
+  ExpoPdfViewer:
+    :path: "../modules/expo-pdf-viewer/ios"
   EXUpdatesInterface:
     :path: "../node_modules/expo-updates-interface/ios"
   FBLazyVector:
@@ -1361,8 +1363,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  ReactNativePdfRenderer:
-    :path: "../node_modules/react-native-pdf-renderer"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNScreens:
@@ -1385,6 +1385,7 @@ SPEC CHECKSUMS:
   ExpoFileSystem: 04795dd4d47e76eaf12e38c92091f77d794f9e7f
   ExpoKeepAwake: 0f5cad99603a3268e50af9a6eb8b76d0d9ac956c
   ExpoModulesCore: 96d1751929ad10622773bb729ab28a8423f0dd0c
+  ExpoPdfViewer: b57f51e310af3c7956f95099f34ec43bba5fe861
   EXUpdatesInterface: 3e444e2093e25b7ca0999a7d8c16e8392dee70c3
   FBLazyVector: fbc4957d9aa695250b55d879c1d86f79d7e69ab4
   FBReactNativeSpec: 86de768f89901ef6ed3207cd686362189d64ac88
@@ -1435,7 +1436,6 @@ SPEC CHECKSUMS:
   React-runtimescheduler: df8945a656356ff10f58f65a70820478bfcf33ad
   React-utils: f5bc61e7ea3325c0732ae2d755f4441940163b85
   ReactCommon: 45b5d4f784e869c44a6f5a8fad5b114ca8f78c53
-  ReactNativePdfRenderer: f8150a13ba9755586b9480e5cf04483de7a3d479
   RNGestureHandler: deda62b8339496ba721a45e0f3e2d7a319932cee
   RNScreens: b582cb834dc4133307562e930e8fa914b8c04ef2
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17

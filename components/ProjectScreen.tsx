@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 import PdfRendererView from "react-native-pdf-renderer";
+import { ExpoPdfViewer } from "../modules/expo-pdf-viewer";
 import * as FileSystem from "expo-file-system";
 
 type Plan = {
@@ -46,22 +47,14 @@ export default function ProjectScreen({ route, navigation }) {
     uri: fileSource,
     cache: false,
   };
+  return <ExpoPdfViewer name="Hello" />;
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Text>{project.name}</Text>
-      <PdfRendererView
-        style={{ backgroundColor: "white" }}
-        source={fileSource}
-        distanceBetweenPages={16}
-        maxZoom={2}
-        singlePage={true}
-        onPageChange={(current, total) => {
-          console.log("onPageChange", { current, total });
-        }}
-      />
-    </SafeAreaView>
-  );
+  // return (
+  //   <SafeAreaView style={{ flex: 1 }}>
+  //     <Text>{project.name}</Text>
+  //     <ExpoPdfViewer name="Hello" />
+  //   </SafeAreaView>
+  // );
 }
 
 const styles = StyleSheet.create({
