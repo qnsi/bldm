@@ -3,12 +3,14 @@ import * as React from "react";
 
 import { ViewProps } from "react-native";
 export type Props = ViewProps;
-
 import { ExpoPdfViewerProps } from "./ExpoPdfViewer.types";
 
-const NativeView: React.ComponentType<ViewProps> =
+const NativeView: React.ComponentType<ExpoPdfViewerProps> =
   requireNativeViewManager("ExpoPdfViewer");
 
 export default function ExpoPdfViewer(props: ExpoPdfViewerProps) {
-  return <NativeView style={{ flex: 1, backgroundColor: "purple" }} />;
+  console.log("ExpoPdfViewer native module. Props: ", props);
+  return (
+    <NativeView style={{ flex: 1, backgroundColor: "purple" }} {...props} />
+  );
 }

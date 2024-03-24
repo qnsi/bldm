@@ -37,7 +37,11 @@ public class ExpoPdfViewerModule: Module {
     View(ExpoPdfViewer.self) {
       // Defines a setter for the `name` prop.
       Prop("name") { (view: ExpoPdfViewer, prop: String) in
-        print(prop)
+        view.updateLabelText(with: prop)
+      }
+      Prop("fileSource") { (view: ExpoPdfViewer, prop: String) in
+        print("Updating file source: " + prop)
+        view.updateFileSource(with: prop)
       }
     }
   }

@@ -4,4 +4,6 @@ export type ChangeEventPayload = {
 
 export type ExpoPdfViewerProps = {
   name: string;
+  fileSource: string;
+  style: any;
 };

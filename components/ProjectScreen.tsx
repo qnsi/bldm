@@ -47,14 +47,14 @@ export default function ProjectScreen({ route, navigation }) {
     uri: fileSource,
     cache: false,
   };
-  return <ExpoPdfViewer name="Hello" />;
+  // return <ExpoPdfViewer name="Hello" />;
 
-  // return (
-  //   <SafeAreaView style={{ flex: 1 }}>
-  //     <Text>{project.name}</Text>
-  //     <ExpoPdfViewer name="Hello" />
-  //   </SafeAreaView>
-  // );
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Text>{project.name}</Text>
+      {fileSource && <ExpoPdfViewer fileSource={fileSource} name="Hello" />}
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
