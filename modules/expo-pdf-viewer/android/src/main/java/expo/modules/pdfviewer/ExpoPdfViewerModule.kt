@@ -40,7 +40,7 @@ class ExpoPdfViewerModule : Module() {
     View(ExpoPdfViewer::class) {
       // Defines a setter for the `name` prop.
       Prop("name") { view: ExpoPdfViewer, prop: String ->
-        println(prop)
+        println("Android native module should work")
       }
     }
   }
