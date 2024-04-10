@@ -6,6 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 import PdfRendererView from "react-native-pdf-renderer";
 import { ExpoPdfViewer } from "../modules/expo-pdf-viewer";
 import * as FileSystem from "expo-file-system";
+import { WebView } from "react-native-webview";
+import { LongPressGestureHandler, State } from "react-native-gesture-handler";
 
 type Plan = {
   name: string;
@@ -21,6 +23,32 @@ export default function ProjectScreen({ route, navigation }) {
   const project = route.params as Project;
   const [plans, setPlans] = React.useState<Plan[]>([]);
   const [fileSource, setFileSource] = React.useState<string>();
+
+  const debugging = `
+  const consoleLog = (type, log) => window.ReactNativeWebView.postMessage(JSON.stringify({'type': 'Console', 'data': {'type': type, 'log': log}}));
+  console = {
+      log: (log) => consoleLog('log', log),
+      debug: (log) => consoleLog('debug', log),
+      info: (log) => consoleLog('info', log),
+      warn: (log) => consoleLog('warn', log),
+      error: (log) => consoleLog('error', log),
+    };
+`;
+
+  const onMessage = (payload) => {
+    let dataPayload;
+    try {
+      dataPayload = JSON.parse(payload.nativeEvent.data);
+    } catch (e) { }
+
+    if (dataPayload) {
+      if (dataPayload.type === "Console") {
+        console.info(`[Console] ${JSON.stringify(dataPayload.data)}`);
+      } else {
+        console.log(dataPayload);
+      }
+    }
+  };
 
   useEffect(() => {
     console.log("ProjectScreen: useEffect, fetching plans");
@@ -53,6 +81,17 @@ export default function ProjectScreen({ route, navigation }) {
     <SafeAreaView style={{ flex: 1 }}>
       <Text>{project.name}</Text>
       {fileSource && <ExpoPdfViewer fileSource={fileSource} name="Hello" />}
+      {/* <WebView */}
+      {/*   style={styles.container} */}
+      {/*   // source={{ uri: "https://web-buildme.vercel.app" }} */}
+      {/*   source={{ uri: "https://67785dae8d4281.lhr.life" }} */}
+      {/*   onTouchStart={(e) => { */}
+      {/*     console.log("onTouchStart, event:", e); */}
+      {/*   }} */}
+      {/*   // onMessage={onMessage} */}
+      {/*   // injectedJavaScript={debugging} */}
+      {/*   webviewDebuggingEnabled={true} */}
+      {/* /> */}
     </SafeAreaView>
   );
 }

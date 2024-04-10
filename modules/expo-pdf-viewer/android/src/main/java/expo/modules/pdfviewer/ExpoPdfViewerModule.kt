@@ -42,6 +42,10 @@ class ExpoPdfViewerModule : Module() {
       Prop("name") { view: ExpoPdfViewer, prop: String ->
         println("Android native module should work")
       }
-    }
+      Prop("fileSource") { view: ExpoPdfViewer, fileSource: String ->
+        println("fileSource prop changed: $fileSource")
+        // Now trigger the PDF update in the view
+        view.updatePdf(fileSource)
+   }   }
   }
 }
