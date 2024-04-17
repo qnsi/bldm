@@ -10,6 +10,7 @@ import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.ImageView
@@ -20,6 +21,49 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
 import java.io.File
 import java.io.IOException
+
+class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+        SubsamplingScaleImageView(context, attrs) {
+    private var strokeWidth: Int = 0
+    private val sCenter = PointF()
+    private val vCenter = PointF()
+    private val paint = Paint()
+
+    init {
+        initialise()
+    }
+
+    private fun initialise() {
+        val density = resources.displayMetrics.densityDpi.toFloat()
+        strokeWidth = (density / 60f).toInt()
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+
+        // Don't draw the circle before the image is ready to avoid it moving around during setup.
+        if (!isReady) {
+            return
+        }
+
+        sCenter.set(getSWidth() / 2f, getSHeight() / 2f)
+        sourceToViewCoord(sCenter, vCenter)
+        val radius = (scale * getSWidth()) * 0.025f
+
+        // paint.apply {
+        //     isAntiAlias = true
+        //     style = Paint.Style.STROKE
+        //     strokeCap = Paint.Cap.ROUND
+        //     strokeWidth = this@CircleView.strokeWidth * 2f
+        //     color = android.graphics.Color.BLACK
+        // }
+        // canvas.drawCircle(vCenter.x, vCenter.y, radius, paint)
+
+        paint.strokeWidth = strokeWidth.toFloat()
+        paint.color = android.graphics.Color.argb(255, 51, 181, 229)
+        canvas.drawCircle(vCenter.x, vCenter.y, radius, paint)
+    }
+}
 
 class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
     fun updatePdf(fileSource: String) {
@@ -36,7 +80,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
             //     setImageBitmap(it)
             // }
             val imageView =
-                    SubsamplingScaleImageView(context).apply {
+                    CircleView(context).apply {
                         resetScaleAndCenter()
                         setImage(ImageSource.cachedBitmap(it))
                     }
@@ -70,7 +114,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
         }
     }
 
-    fun drawOnImage(imageView: SubsamplingScaleImageView, coord: PointF) {
+    fun drawOnImage(imageView: CircleView, coord: PointF) {
         val overlay =
                 Bitmap.createBitmap(imageView.width, imageView.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(overlay)
