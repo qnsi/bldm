@@ -27,7 +27,7 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private val sCenter = PointF()
     private val vCenter = PointF()
     private val paint = Paint()
-    private val circlePoints = mutableListOf<PointF>()
+    val circlePoints = mutableListOf<PointF>()
 
     init {
         initialise()
@@ -48,7 +48,7 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
         sCenter.set(getSWidth() / 2f, getSHeight() / 2f)
         sourceToViewCoord(sCenter, vCenter)
-        val radius = (scale * getSWidth()) * 0.025f
+        val radius = (scale * getSWidth()) * 0.02f
 
         // paint.apply {
         //     isAntiAlias = true
@@ -69,6 +69,11 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     fun addCirclePoint(sPin: PointF) {
         circlePoints.add(sPin)
+        invalidate() // Trigger a redraw
+    }
+
+    fun removeCirclePoint(sPin: PointF) {
+        circlePoints.remove(sPin)
         invalidate() // Trigger a redraw
     }
 }
@@ -99,13 +104,48 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                             object : GestureDetector.SimpleOnGestureListener() {
                                 override fun onLongPress(e: MotionEvent) {
                                     super.onLongPress(e)
-                                    Toast.makeText(context, "Long press", Toast.LENGTH_SHORT).show()
                                     println("onLongPress triggered")
                                     e?.let { event ->
                                         val sCoord = imageView.viewToSourceCoord(event.x, event.y)
-                                        println("sCoord: $sCoord")
                                         sCoord?.let { coord -> drawOnImage(imageView, coord) }
                                     }
+                                }
+
+                                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                                    println("onSingleTapConfirmed triggered")
+                                    println("imageView circlePoints: ${imageView.circlePoints}")
+                                    e?.let { event ->
+                                        val sCoord = imageView.viewToSourceCoord(event.x, event.y)
+                                        if (sCoord == null) {
+                                            return true
+                                        }
+                                        for (point in imageView.circlePoints) {
+                                            val distance =
+                                                    Math.sqrt(
+                                                            Math.pow(
+                                                                    (sCoord.x - point.x).toDouble(),
+                                                                    2.0
+                                                            ) +
+                                                                    Math.pow(
+                                                                            (sCoord.y - point.y)
+                                                                                    .toDouble(),
+                                                                            2.0
+                                                                    )
+                                                    )
+                                            println("distance: $distance")
+                                            if (distance < 40) {
+                                                Toast.makeText(
+                                                                context,
+                                                                "Circle clicked",
+                                                                Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                imageView.removeCirclePoint(point)
+                                                return true
+                                            }
+                                        }
+                                    }
+                                    return true
                                 }
 
                                 // override fun onDown(e: MotionEvent): Boolean {
