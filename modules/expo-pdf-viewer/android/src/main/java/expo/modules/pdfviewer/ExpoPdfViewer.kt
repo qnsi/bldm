@@ -13,7 +13,6 @@ import android.os.ParcelFileDescriptor
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.widget.ImageView
 import android.widget.Toast
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
@@ -28,6 +27,7 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private val sCenter = PointF()
     private val vCenter = PointF()
     private val paint = Paint()
+    private val circlePoints = mutableListOf<PointF>()
 
     init {
         initialise()
@@ -59,9 +59,17 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         // }
         // canvas.drawCircle(vCenter.x, vCenter.y, radius, paint)
 
-        paint.strokeWidth = strokeWidth.toFloat()
-        paint.color = android.graphics.Color.argb(255, 51, 181, 229)
-        canvas.drawCircle(vCenter.x, vCenter.y, radius, paint)
+        for (point in circlePoints) {
+            val viewCoord = sourceToViewCoord(point) ?: continue
+            paint.strokeWidth = strokeWidth.toFloat()
+            paint.color = android.graphics.Color.argb(255, 51, 181, 229)
+            canvas.drawCircle(viewCoord.x, viewCoord.y, radius, paint)
+        }
+    }
+
+    fun addCirclePoint(sPin: PointF) {
+        circlePoints.add(sPin)
+        invalidate() // Trigger a redraw
     }
 }
 
@@ -100,11 +108,11 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                                     }
                                 }
 
-                                override fun onDown(e: MotionEvent): Boolean {
-                                    super.onDown(e)
-                                    println("onDown triggered")
-                                    return true // Necessary to receive gestures
-                                }
+                                // override fun onDown(e: MotionEvent): Boolean {
+                                //     // super.onDown(e)
+                                //     println("onDown triggered")
+                                //     return true // Necessary to receive gestures
+                                // }
                             }
                     )
 
@@ -115,30 +123,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
     }
 
     fun drawOnImage(imageView: CircleView, coord: PointF) {
-        val overlay =
-                Bitmap.createBitmap(imageView.width, imageView.height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(overlay)
-
-        val paint =
-                Paint().apply {
-                    color = android.graphics.Color.RED // Set the color of the circle
-                    style = Paint.Style.FILL // Set the style
-                    isAntiAlias = true
-                }
-
-        // Draw on the overlay
-        println("drawing on image")
-        canvas.drawCircle(coord.x, coord.y, 80f, paint)
-        canvas.drawCircle(160f, 160f, 80f, paint)
-
-        // Create an ImageView for the overlay and add it to the layout
-        val overlayView = ImageView(context).apply { setImageBitmap(overlay) }
-        // (imageView.parent as ViewGroup).addView(overlayView)
-        this.apply {
-            removeAllViews()
-            addView(overlayView)
-            overlayView.bringToFront()
-        }
+        imageView.addCirclePoint(coord)
     }
 
     private fun renderPage(context: Context, filePath: String, pageIndex: Int): Bitmap? {
