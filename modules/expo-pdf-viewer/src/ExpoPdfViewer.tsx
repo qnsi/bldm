@@ -10,7 +10,5 @@ const NativeView: React.ComponentType<ExpoPdfViewerProps> =
 
 export default function ExpoPdfViewer(props: ExpoPdfViewerProps) {
   console.log("ExpoPdfViewer native module. Props: ", props);
-  return (
-    <NativeView style={{ flex: 1, backgroundColor: "purple" }} {...props} />
-  );
+  return <NativeView {...props} />;
 }

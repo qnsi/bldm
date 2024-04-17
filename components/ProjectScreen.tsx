@@ -80,18 +80,13 @@ export default function ProjectScreen({ route, navigation }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Text>{project.name}</Text>
-      {fileSource && <ExpoPdfViewer fileSource={fileSource} name="Hello" />}
-      {/* <WebView */}
-      {/*   style={styles.container} */}
-      {/*   // source={{ uri: "https://web-buildme.vercel.app" }} */}
-      {/*   source={{ uri: "https://67785dae8d4281.lhr.life" }} */}
-      {/*   onTouchStart={(e) => { */}
-      {/*     console.log("onTouchStart, event:", e); */}
-      {/*   }} */}
-      {/*   // onMessage={onMessage} */}
-      {/*   // injectedJavaScript={debugging} */}
-      {/*   webviewDebuggingEnabled={true} */}
-      {/* /> */}
+      {fileSource && (
+        <ExpoPdfViewer
+          style={{ flex: 1 }}
+          fileSource={fileSource}
+          name="Hello"
+        />
+      )}
     </SafeAreaView>
   );
 }
