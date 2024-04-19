@@ -23,6 +23,7 @@ export default function ProjectScreen({ route, navigation }) {
   const project = route.params as Project;
   const [plans, setPlans] = React.useState<Plan[]>([]);
   const [fileSource, setFileSource] = React.useState<string>();
+  const [pins, setPins] = React.useState<{ x: number; y: number }[]>([]);
 
   const debugging = `
   const consoleLog = (type, log) => window.ReactNativeWebView.postMessage(JSON.stringify({'type': 'Console', 'data': {'type': type, 'log': log}}));
@@ -39,7 +40,7 @@ export default function ProjectScreen({ route, navigation }) {
     let dataPayload;
     try {
       dataPayload = JSON.parse(payload.nativeEvent.data);
-    } catch (e) { }
+    } catch (e) {}
 
     if (dataPayload) {
       if (dataPayload.type === "Console") {
@@ -76,13 +77,32 @@ export default function ProjectScreen({ route, navigation }) {
     cache: false,
   };
   // return <ExpoPdfViewer name="Hello" />;
+  //
+  const addPin = (event) => {
+    console.log("addPin, event: ", event.nativeEvent);
+    const x = event.nativeEvent.data.x;
+    const y = event.nativeEvent.data.y;
+    setPins((pins) => [...pins, { x, y }]);
+  };
+  const removePin = (event) => {
+    console.log("removePin, event: ", event.nativeEvent);
+    const x = event.nativeEvent.data.x;
+    const y = event.nativeEvent.data.y;
+    if (event) {
+      console.log("removePin, event: ", event.nativeEvent);
+      setPins((pins) => pins.filter((pin) => pin.x !== x && pin.y !== y));
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Text>{project.name}</Text>
       {fileSource && (
         <ExpoPdfViewer
+          pins={pins}
           style={{ flex: 1 }}
+          addPin={addPin}
+          removePin={removePin}
           fileSource={fileSource}
           name="Hello"
         />

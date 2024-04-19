@@ -82,10 +82,14 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
     val addPin by EventDispatcher()
     val removePin by EventDispatcher()
-    fun updatePins(pins: List<Point>) {
+    fun updatePins(pins: List<Pin>?) {
         println("updatePins triggered. Pins: $pins")
         val imageView = this.getChildAt(0) as CircleView
         imageView.circlePoints.clear()
+
+        if (pins == null) {
+            return
+        }
         for (pin in pins) {
             imageView.addCirclePoint(PointF(pin.x.toFloat(), pin.y.toFloat()))
         }
@@ -153,11 +157,17 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                                                         )
                                                         .show()
                                                 // imageView.removeCirclePoint(point)
-                                                removePin(mapOf("coord" to point))
                                                 removePin(
                                                         mapOf(
-                                                                "x" to point.x.toDouble(),
-                                                                "y" to point.y.toDouble()
+                                                                "data" to
+                                                                        mapOf(
+                                                                                "x" to
+                                                                                        point.x
+                                                                                                .toDouble(),
+                                                                                "y" to
+                                                                                        point.y
+                                                                                                .toDouble()
+                                                                        )
                                                         )
                                                 )
                                                 return true
@@ -182,7 +192,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
     }
 
     fun drawOnImage(imageView: CircleView, coord: PointF) {
-        addPin(mapOf("x" to coord.x.toDouble(), "y" to coord.y.toDouble()))
+        addPin(mapOf("data" to mapOf("x" to coord.x.toDouble(), "y" to coord.y.toDouble())))
     }
 
     private fun renderPage(context: Context, filePath: String, pageIndex: Int): Bitmap? {

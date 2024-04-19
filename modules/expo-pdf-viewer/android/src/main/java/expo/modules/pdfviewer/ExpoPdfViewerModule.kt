@@ -3,7 +3,7 @@ package expo.modules.pdfviewer
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
-data class Point(val x: Double, val y: Double)
+data class Pin(val x: Number, val y: Number)
 
 class ExpoPdfViewerModule : Module() {
   // Each module class must implement the definition function. The definition consists of components
@@ -36,10 +36,32 @@ class ExpoPdfViewerModule : Module() {
         // Now trigger the PDF update in the view
         view.updatePdf(fileSource)
       }
-      Prop("pins") { view: ExpoPdfViewer, pins: List<Point> ->
+      Prop("pins") { view: ExpoPdfViewer, pins: List<Any> ->
         println("pins prop changed: $pins")
         // Now trigger the PDF update in the view
-        view.updatePins(pins)
+
+        // val array = pins as? ReadableArray ?: null
+        // println("convert: array: $array")
+        val list = mutableListOf<Pin>()
+
+        for (pin in pins) {
+          println("pin: pin: $pin")
+          val item = pin as? Map<String, Number> // Safe cast to Map
+          if (item != null) {
+            val x = item["x"]
+            val y = item["y"]
+            if (x != null && y != null) {
+              list.add(Pin(x, y))
+              println("Pin coordinates: x = ${x.toDouble()}, y = ${y.toDouble()}")
+              // Perform your operations with x and y here
+            }
+          }
+        }
+        val convertedPins = list
+
+        println("is convert safjdk ")
+        println("convertedPins : $convertedPins")
+        view.updatePins(list)
       }
       Events("addPin", "removePin")
     }

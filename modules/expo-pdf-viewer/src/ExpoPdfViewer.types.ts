@@ -8,4 +8,5 @@ export type ExpoPdfViewerProps = {
   style: any;
   removePin: (event: any) => void;
   addPin: (event: any) => void;
+  pins: { x: number; y: number }[];
 };
