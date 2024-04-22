@@ -63,7 +63,7 @@ class ExpoPdfViewerModule : Module() {
         println("convertedPins : $convertedPins")
         view.updatePins(list)
       }
-      Events("addPin", "removePin")
+      Events("addPin", "clickPin")
     }
   }
 }

@@ -81,7 +81,7 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
 class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
     val addPin by EventDispatcher()
-    val removePin by EventDispatcher()
+    val clickPin by EventDispatcher()
     fun updatePins(pins: List<Pin>?) {
         println("updatePins triggered. Pins: $pins")
         val imageView = this.getChildAt(0) as CircleView
@@ -157,7 +157,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                                                         )
                                                         .show()
                                                 // imageView.removeCirclePoint(point)
-                                                removePin(
+                                                clickPin(
                                                         mapOf(
                                                                 "data" to
                                                                         mapOf(

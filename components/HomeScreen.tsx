@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { createClient } from "@supabase/supabase-js";
 
+// import from utils/supabase
 const supabase = createClient(
   "https://okqjlkjppcfdjjmumweh.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rcWpsa2pwcGNmZGpqbXVtd2VoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA4NzAxNDUsImV4cCI6MjAyNjQ0NjE0NX0.QjEDBglODFUU0U7Qg1D1dedr3tgUyPwigihvb7Bp-2Y",
