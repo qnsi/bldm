@@ -8,12 +8,9 @@ import {
   Pressable,
 } from "react-native";
 import { createClient } from "@supabase/supabase-js";
-
-// import from utils/supabase
-const supabase = createClient(
-  "https://okqjlkjppcfdjjmumweh.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rcWpsa2pwcGNmZGpqbXVtd2VoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA4NzAxNDUsImV4cCI6MjAyNjQ0NjE0NX0.QjEDBglODFUU0U7Qg1D1dedr3tgUyPwigihvb7Bp-2Y",
-);
+import { Workspace } from "./WorkspacesScreen";
+import { useSession } from "../utils/sessionContext";
+import { supabase } from "../utils/supabase";
 
 export type Project = {
   name: string;
@@ -22,13 +19,20 @@ export type Project = {
   plans: string[];
 };
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ route, navigation }) {
+  const workspace = route.params as Workspace;
+  const session = useSession();
   const [projects, setProjects] = React.useState<Project[]>([]);
   useEffect(() => {
-    console.log("HomeScreen: useEffect fetching projects");
+    console.log(
+      "HomeScreen: useEffect fetching projects for workspace.id: ",
+      workspace.id,
+    );
+    console.log("HomeScreen: session.user.id", session?.user.id);
     supabase
       .from("projects")
       .select()
+      .eq("workspace_id", workspace.id)
       .then((result) => {
         console.log("HomeScreen: useEffect projects fetching result: ", result);
         // result:  {"count": null, "data": [{"created_at": "2024-03-19T18:03:44.38948+00:00", "id": 1, "name": "Garwolin", "thumbnail_url": "https://okqjlkjppcfdjjmumweh.supabase.co/storage/v1/object/sign/plan_thumbnails/Garwolin.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJwbGFuX3RodW1ibmFpbHMvR2Fyd29saW4uanBnIiwiaWF0IjoxNzEwODcxMzI5LCJleHAiOjIwMjYyMzEzMjl9.GO-14NIxlxtdcQCvOnGK9G8RuQTxIL7aD8IRKmKFHD0"}], "error": null, "status": 200, "statusText": ""}
@@ -48,8 +52,9 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Projekty</Text>
+      <Text style={styles.header}>Projekty w zespole {workspace.name}</Text>
       <FlatList
+        style={styles.projects}
         data={projects}
         renderItem={({ item, index }) => (
           <View>
@@ -66,6 +71,11 @@ export default function HomeScreen({ navigation }) {
           </View>
         )}
       />
+      <Pressable style={styles.addNew}>
+        <View>
+          <Text>Dodaj nowy projekt</Text>
+        </View>
+      </Pressable>
     </View>
   );
 }
@@ -99,5 +109,12 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     borderRadius: 10,
+  },
+  projects: {
+    // height: "80%",
+    flexGrow: 1,
+  },
+  addNew: {
+    height: "10%",
   },
 });
