@@ -40,6 +40,7 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     }
 
     override fun onDraw(canvas: Canvas) {
+        println("onDraw, canvas: $canvas")
         super.onDraw(canvas)
 
         // Don't draw the circle before the image is ready to avoid it moving around during setup.
@@ -48,6 +49,7 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
 
         sCenter.set(getSWidth() / 2f, getSHeight() / 2f)
+        println("sCenter: $sCenter")
         sourceToViewCoord(sCenter, vCenter)
         val radius = (scale * getSWidth()) * 0.02f
 
@@ -99,11 +101,16 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
         println("updatePdf triggered. Filesource: $fileSource")
         val filePath = fileSource.replace("file://", "")
         // Clear existing views (e.g., remove old PDF image)
+        val totalViews = this.childCount
+        println("Total views before removal: $totalViews")
         this.removeAllViews()
+        val totalViewsAfter = this.childCount
+        println("Total views after removal: $totalViewsAfter")
 
         // Render new PDF
         val pdfPageBitmap = renderPage(context, filePath, 0)
         println("pdfPageBitmap: $pdfPageBitmap")
+        println("pdfPageBitmap.width: ${pdfPageBitmap?.width}")
         pdfPageBitmap?.let {
             // val imageView = ImageView(context).apply {
             //     setImageBitmap(it)
@@ -113,6 +120,9 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                         resetScaleAndCenter()
                         setImage(ImageSource.cachedBitmap(it))
                     }
+
+        imageView.circlePoints.clear()
+            // imageView.invalidate()
 
             val gestureDetector =
                     GestureDetector(
@@ -187,7 +197,11 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
 
             imageView.setOnTouchListener { _, event -> gestureDetector.onTouchEvent(event) }
 
+            println("this.addView, imageView: $imageView")
             this.addView(imageView)
+            println("this.addView, this: $this")
+            val addViewChildCount = this.childCount
+            println("this.addView Total views after addition: $addViewChildCount")
         }
     }
 
@@ -201,51 +215,26 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
         val screenWidth = metrics.widthPixels
         val screenHeight = metrics.heightPixels
 
-        try {
+        return try {
             // Kotlin's use function automatically manages the closing of resources
             ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use {
                     fileDescriptor ->
                 PdfRenderer(fileDescriptor).use { pdfRenderer ->
                     if (pageIndex < 0 || pageIndex >= pdfRenderer.pageCount) {
-                        // Return null if the page index is invalid
-                        return null
+                        return@use null
                     }
 
-                    val page = pdfRenderer.openPage(pageIndex)
-                    page.use {
+                    return pdfRenderer.openPage(pageIndex).use { page ->
                         val scale = screenWidth.toFloat() / page.width
                         val scaledHeight = (page.height * scale).toInt()
 
-                        // Render the PDF page bitmap
-                        val pdfPageBitmap =
-                                Bitmap.createBitmap(
-                                        screenWidth,
-                                        scaledHeight,
-                                        Bitmap.Config.ARGB_8888
-                                )
-                        page.render(
-                                pdfPageBitmap,
-                                null,
-                                null,
-                                PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
-                        )
+                        val pdfPageBitmap = Bitmap.createBitmap(screenWidth, scaledHeight, Bitmap.Config.ARGB_8888)
+                        page.render(pdfPageBitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-                        // Calculate the positions for the PDF bitmap in the final bitmap
-                        val topPadding = (screenHeight - scaledHeight) / 2
-                        val bottomPadding = screenHeight - scaledHeight - topPadding
-
-                        // Create the final bitmap with transparent background
-                        val finalBitmap =
-                                Bitmap.createBitmap(
-                                        screenWidth,
-                                        screenHeight,
-                                        Bitmap.Config.ARGB_8888
-                                )
-
-                        // Draw the PDF page bitmap onto the final bitmap
+                        val finalBitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888)
                         val canvas = Canvas(finalBitmap)
-                        canvas.drawColor(Color.TRANSPARENT) // Ensure background is transparent
-                        canvas.drawBitmap(pdfPageBitmap, 0f, topPadding.toFloat(), null)
+                        canvas.drawColor(Color.TRANSPARENT)
+                        canvas.drawBitmap(pdfPageBitmap, 0f, ((screenHeight - scaledHeight) / 2).toFloat(), null)
 
                         return finalBitmap // This is your final bitmap with transparent padding
                     }

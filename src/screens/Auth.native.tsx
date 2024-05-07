@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { supabase } from "../utils/supabase";
+import { supabase } from "../../utils/supabase";
 import {
   GoogleSignin,
   GoogleSigninButton,
@@ -94,7 +94,7 @@ export function AuthScreen() {
 
   if (Platform.OS === "ios") {
     return (
-      <>
+      <View style={styles.container}>
         {EmailAuth}
         <AppleAuthentication.AppleAuthenticationButton
           buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
@@ -132,7 +132,7 @@ export function AuthScreen() {
             }
           }}
         />
-      </>
+      </View>
     );
   } else if (Platform.OS === "android") {
     GoogleSignin.configure({

@@ -2,6 +2,7 @@
   "expo": {
     "name": "build-me",
     "slug": "build-me",
+    "scheme": "buildme",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -44,7 +45,19 @@
       [
         "expo-apple-authentication"
       ],
-      "expo-secure-store"
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Aplikacja wymaga dostępu do zdjęć, aby wgrywać zdjęcia projektów."
+        }
+      ],
+      "expo-secure-store",
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ]
     ]
   }
 }
