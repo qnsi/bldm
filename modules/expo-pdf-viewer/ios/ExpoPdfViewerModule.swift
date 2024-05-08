@@ -1,5 +1,11 @@
 import ExpoModulesCore
 
+struct Pin {
+    var x: Double
+    var y: Double
+}
+
+
 public class ExpoPdfViewerModule: Module {
   // Each module class must implement the definition function. The definition consists of components
   // that describes the module's functionality and behavior.
@@ -43,6 +49,41 @@ public class ExpoPdfViewerModule: Module {
         print("Updating file source: " + prop)
         view.updateFileSource(with: prop)
       }
+      Prop("pins") { (view: ExpoPdfViewer, pins: [Pin]) in
+        let pinDescriptions = pins.map { pin in
+          return "(\(pin.x), \(pin.y))"
+        }.joined(separator: ", ")
+        print("pins prop changed: [\(pinDescriptions)]")
+        // view.updatePins(with: pins)
+      }
+      Events("addPin")
     }
+    //     // Now trigger the PDF update in the view
+    //
+    //     // val array = pins as? ReadableArray ?: null
+    //     // println("convert: array: $array")
+    //     val list = mutableListOf<Pin>()
+    //
+    //     for (pin in pins) {
+    //       println("pin: pin: $pin")
+    //       val item = pin as? Map<String, Number> // Safe cast to Map
+    //       if (item != null) {
+    //         val x = item["x"]
+    //         val y = item["y"]
+    //         if (x != null && y != null) {
+    //           list.add(Pin(x, y))
+    //           println("Pin coordinates: x = ${x.toDouble()}, y = ${y.toDouble()}")
+    //           // Perform your operations with x and y here
+    //         }
+    //       }
+    //     }
+    //     val convertedPins = list
+    //
+    //     println("is convert safjdk ")
+    //     println("convertedPins : $convertedPins")
+    //     view.updatePins(list)
+    //   }
+    //   Events("addPin", "clickPin")
+    // }
   }
 }

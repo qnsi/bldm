@@ -19,6 +19,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
     private var label: UILabel!
     private var fileUrlString: String = ""
     private var pdfView = PDFView()
+    let addPin = EventDispatcher()
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -60,11 +61,12 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
   }
 
   @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-    print("handleLongPress triggered")
-        if gestureRecognizer.state == .began {
+        print("handleLongPress triggered")
+        // if gestureRecognizer.state == .began {
             let location = gestureRecognizer.location(in: gestureRecognizer.view)
-            addAnnotation(at: location)
-        }
+            addPin(["message": ["x": location.x, "y": location.y]])
+            // addAnnotation(at: location)
+        // }
     }
     
     func addAnnotation(at point: CGPoint) {
@@ -97,7 +99,9 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             longPressRecognizer.delegate = self
             pdfView.addGestureRecognizer(longPressRecognizer)
 
-            print(pdfView.gestureRecognizers)
+            print("Testing addPin event dispatching")
+            addPin(["message": ["x": 0.0, "y": 10.0]])
+            print("Testing addPin Event dispatchered finished")
 
         } else {
             print("Could not load document.")
