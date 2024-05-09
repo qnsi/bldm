@@ -8,9 +8,9 @@ import {
   Pressable,
 } from "react-native";
 import { createClient } from "@supabase/supabase-js";
-import { useSession } from "../../utils/sessionContext";
-import { supabase } from "../../utils/supabase";
-import { CustomModal } from "../components/CustomModal";
+import { useSession } from "src/utils/sessionContext";
+import { supabase } from "src/utils/supabase";
+import { CustomModal } from "src/components/CustomModal";
 import { Button, Fieldset, Input, Label } from "tamagui";
 
 export type Workspace = {

@@ -8,14 +8,15 @@ import {
   Pressable,
 } from "react-native";
 import { createClient } from "@supabase/supabase-js";
-import { Workspace } from "./WorkspacesScreen";
-import { useSession } from "../../utils/sessionContext";
-import { supabase } from "../../utils/supabase";
+import { Workspace } from "src/features/teams/screens/WorkspacesScreen";
+import { useSession } from "src/utils/sessionContext";
+import { supabase } from "src/utils/supabase";
 import * as ImagePicker from "expo-image-picker";
 import { decode } from "base64-arraybuffer";
-import { CustomModal } from "../components/CustomModal";
+import { CustomModal } from "src/components/CustomModal";
 import { Button, Fieldset, Input, Label } from "tamagui";
 import * as Clipboard from "expo-clipboard";
+import { DropdownElement, HeaderRight } from "src/components/DropdownMenu";
 
 export type Project = {
   id: number;
@@ -39,21 +40,35 @@ export default function HomeScreen({ route, navigation }) {
 
   const screenOptions = {
     headerRight: () => (
-      <>
-        <Pressable
-          style={
-            StyleSheet.create({ pressable: { paddingRight: 20 } }).pressable
-          }
-          onPress={() => setDropdownVisible((prev) => !prev)}
-        >
-          <Text>...</Text>
-        </Pressable>
-        <DropdownMenu
-          isVisible={dropdownVisible}
-          createNewInvitation={createNewInvitation}
-          invitationDeepLink={invitationDeepLink}
-        />
-      </>
+      <HeaderRight
+        dropDownElements={
+          <>
+            <DropdownElement
+              onPress={() => supabase.auth.signOut()}
+              text={"Sign out"}
+            />
+            <CustomModal
+              trigger={
+                <Pressable onPress={createNewInvitation}>
+                  <Text>Dodaj osoby do zespołu</Text>
+                </Pressable>
+              }
+              title={"Dodaj osoby do zespolu"}
+              body={
+                <>
+                  <Text>{invitationDeepLink}</Text>
+                  <Button
+                    onPress={() => Clipboard.setStringAsync(invitationDeepLink)}
+                  >
+                    Skopiuj link
+                  </Button>
+                </>
+              }
+              downButtons={<></>}
+            />
+          </>
+        }
+      />
     ),
   };
 
@@ -300,62 +315,5 @@ const styles = StyleSheet.create({
   },
   addNew: {
     height: "10%",
-  },
-});
-
-const DropdownMenu = ({
-  isVisible,
-  createNewInvitation,
-  invitationDeepLink,
-}: {
-  isVisible: boolean;
-  createNewInvitation: () => void;
-  invitationDeepLink: string;
-}) => {
-  if (!isVisible) return null;
-
-  return (
-    <View style={dropdownStyles.dropdown}>
-      <Pressable
-        onPress={() => supabase.auth.signOut()}
-        style={dropdownStyles.dropdownItem}
-      >
-        <Text>Sign Out</Text>
-      </Pressable>
-      <CustomModal
-        trigger={
-          <Pressable onPress={createNewInvitation}>
-            <Text>Dodaj osoby do zespołu</Text>
-          </Pressable>
-        }
-        title={"Dodaj osoby do zespolu"}
-        body={
-          <>
-            <Text>{invitationDeepLink}</Text>
-            <Button
-              onPress={() => Clipboard.setStringAsync(invitationDeepLink)}
-            >
-              Skopiuj link
-            </Button>
-          </>
-        }
-        downButtons={<></>}
-      />
-    </View>
-  );
-};
-
-const dropdownStyles = StyleSheet.create({
-  dropdown: {
-    position: "absolute",
-    right: 10,
-    top: 50,
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 5,
-  },
-  dropdownItem: {
-    padding: 10,
   },
 });

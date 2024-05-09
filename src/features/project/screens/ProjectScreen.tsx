@@ -11,7 +11,7 @@ import {
   Button,
   Image,
 } from "react-native";
-import { Project } from "./ProjectsScreen";
+import { Project } from "src/features/projects/screens/ProjectsScreen";
 import React, { useEffect } from "react";
 import {
   Button as TmgButton,
@@ -29,16 +29,14 @@ import { Check, ChevronDown } from "@tamagui/lucide-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 
-import PdfRendererView from "react-native-pdf-renderer";
-import { ExpoPdfViewer } from "../../modules/expo-pdf-viewer";
+import { ExpoPdfViewer } from "modules/expo-pdf-viewer";
 import * as FileSystem from "expo-file-system";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { WebView } from "react-native-webview";
-import { LongPressGestureHandler, State } from "react-native-gesture-handler";
-import { supabase } from "../../utils/supabase";
-import { CustomModal } from "../components/CustomModal";
-import { Workspace } from "./WorkspacesScreen";
+import { supabase } from "src/utils/supabase";
+import { CustomModal } from "src/components/CustomModal";
+import { Workspace } from "src/features/teams/screens/WorkspacesScreen";
 import { decode } from "base64-arraybuffer";
+import { DropdownElement, HeaderRight } from "src/components/DropdownMenu";
 
 type Plan = {
   id: number;
@@ -71,20 +69,17 @@ export default function ProjectScreen({ route, navigation }) {
 
   const screenOptions = {
     headerRight: () => (
-      <>
-        <Pressable
-          style={
-            StyleSheet.create({ pressable: { paddingRight: 20 } }).pressable
-          }
-          onPress={() => setDropdownVisible((prev) => !prev)}
-        >
-          <Text>...</Text>
-        </Pressable>
-        <DropdownMenu
-          isVisible={dropdownVisible}
-          removeProject={removeProject}
-        />
-      </>
+      <HeaderRight
+        dropDownElements={
+          <>
+            <DropdownElement
+              onPress={() => supabase.auth.signOut()}
+              text={"Sign out"}
+            />
+            <DropdownElement onPress={removeProject} text={"Remove Project"} />
+          </>
+        }
+      />
     ),
   };
 
@@ -617,45 +612,6 @@ const EditPinModal = ({ isVisible, onClose, updatePin, pinId, pins }) => {
     </Modal>
   );
 };
-
-const DropdownMenu = ({
-  isVisible,
-  removeProject,
-}: {
-  isVisible: boolean;
-  removeProject: () => void;
-}) => {
-  if (!isVisible) return null;
-
-  return (
-    <View style={dropdownStyles.dropdown}>
-      <Pressable
-        onPress={() => supabase.auth.signOut()}
-        style={dropdownStyles.dropdownItem}
-      >
-        <Text>Sign Out</Text>
-      </Pressable>
-      <Pressable onPress={removeProject} style={dropdownStyles.dropdownItem}>
-        <Text>Remove Project</Text>
-      </Pressable>
-    </View>
-  );
-};
-
-const dropdownStyles = StyleSheet.create({
-  dropdown: {
-    position: "absolute",
-    right: 10,
-    top: 50,
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 5,
-  },
-  dropdownItem: {
-    padding: 10,
-  },
-});
 
 const modalStyles = StyleSheet.create({
   modal: {

@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { supabase } from "../../utils/supabase";
+import { supabase } from "src/utils/supabase";
 import {
   GoogleSignin,
   GoogleSigninButton,
