@@ -321,8 +321,8 @@ export default function ProjectScreen({ route, navigation }) {
           key={hackKey}
           pins={pins}
           style={{ flex: 1 }}
-          addPin={handleLongTap}
-          clickPin={clickPin}
+          onAddPin={handleLongTap}
+          onClickPin={clickPin}
           fileSource={fileSource}
           name="Hello"
         />

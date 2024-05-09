@@ -19,7 +19,9 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
     private var label: UILabel!
     private var fileUrlString: String = ""
     private var pdfView = PDFView()
-    let addPin = EventDispatcher()
+    private var statePins: [CGPoint] = []
+    let onAddPin = EventDispatcher()
+    let onClickPin = EventDispatcher()
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -62,26 +64,70 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
 
   @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         print("handleLongPress triggered")
-        // if gestureRecognizer.state == .began {
+        if gestureRecognizer.state == .began {
             let location = gestureRecognizer.location(in: gestureRecognizer.view)
-            addPin(["message": ["x": location.x, "y": location.y]])
+            guard let page = pdfView.page(for: location, nearest: true) else { return }
+            let locationOnPage = pdfView.convert(location, to: page)
+            self.onAddPin(["data": ["x": locationOnPage.x, "y": locationOnPage.y]])
             // addAnnotation(at: location)
-        // }
+         }
     }
     
-    func addAnnotation(at point: CGPoint) {
-        print("addAnnotation triggered")
-        guard let page = pdfView.page(for: point, nearest: true) else { return }
-        let locationOnPage = pdfView.convert(point, to: page)
-
-        // Example: Adding a text annotation. You can customize this part as needed.
-        let annotation = PDFAnnotation(bounds: CGRect(x: locationOnPage.x, y: locationOnPage.y, width: 200, height: 50), forType: .text, withProperties: nil)
-        annotation.contents = "Your annotation text here"
-        page.addAnnotation(annotation)
+    @objc func handleSingleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        print("handleSingleTap triggered")
+        if gestureRecognizer.state == .ended {
+            let locationInView = gestureRecognizer.location(in: gestureRecognizer.view)
+            
+            // Convert the view coordinates into page coordinates
+            if let page = pdfView.page(for: locationInView, nearest: true) {
+            let locationInPage = pdfView.convert(locationInView, to: page)
+                
+                for pin in statePins {
+                    print("pin.x", pin.x)
+                    print("pin.y", pin.y)
+                    let distance = sqrt(
+                        pow(Double(locationInPage.x - pin.x), 2.0) +
+                        pow(Double(locationInPage.y - pin.y), 2.0)
+                    )
+                    print("distance: ", distance)
+                    if distance < 40 {
+                        print("Triggering onClickPin")
+                        print("typeof(onClickPin)", type(of: self.onClickPin))
+                        self.onClickPin(["data": ["x": pin.x, "y": pin.y]])
+                    }
+                }
+                
+                
+                // Here, you can handle the tap as needed
+                print("Single tap at page coordinates: \(locationInPage)")
+                // Example: Add annotation or perform other actions
+            }
+        }
+    }
+    
+    func updateLabelText(with text: String) {
+        //       label.text = text
     }
 
-  func updateLabelText(with text: String) {
-  //       label.text = text
+    func updatePins(with pins: [CGPoint]) {
+        // Clean previous circles
+        self.statePins = pins
+        if (pdfView.document != nil) {
+            guard let pdfPage = pdfView.currentPage else { return }
+            pdfPage.annotations.forEach { pdfPage.removeAnnotation($0) }
+            print("updatePins triggered")
+            print("Pins: \(pins)")
+            for pin in pins {
+                let circleBounds = CGRect(x: pin.x-10, y: pin.y-10, width: 20, height: 20)
+                let circleAnnotation = PDFAnnotation(bounds: circleBounds, forType: .circle, withProperties: nil)
+                
+                circleAnnotation.color = .red
+                circleAnnotation.border = PDFBorder()
+                circleAnnotation.border?.lineWidth = 2
+                
+                pdfPage.addAnnotation(circleAnnotation)
+            }
+        }
     }
   func updateFileSource(with text: String) {
       print("updateFileSource triggered")
@@ -98,9 +144,13 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
             longPressRecognizer.delegate = self
             pdfView.addGestureRecognizer(longPressRecognizer)
+            
+            print("Adding singleTap gesture recognizer")
+            let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleSingleTap(_:)))
+            tapRecognizer.delegate = self
+            pdfView.addGestureRecognizer(tapRecognizer)
 
             print("Testing addPin event dispatching")
-            addPin(["message": ["x": 0.0, "y": 10.0]])
             print("Testing addPin Event dispatchered finished")
 
         } else {

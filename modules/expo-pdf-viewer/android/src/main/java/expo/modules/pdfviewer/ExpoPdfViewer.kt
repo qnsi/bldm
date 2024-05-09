@@ -82,8 +82,8 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 }
 
 class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
-    val addPin by EventDispatcher()
-    val clickPin by EventDispatcher()
+    val onAddPin by EventDispatcher()
+    val onClickPin by EventDispatcher()
     fun updatePins(pins: List<Pin>?) {
         println("updatePins triggered. Pins: $pins")
         val imageView = this.getChildAt(0) as CircleView
@@ -167,7 +167,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                                                         )
                                                         .show()
                                                 // imageView.removeCirclePoint(point)
-                                                clickPin(
+                                                onClickPin(
                                                         mapOf(
                                                                 "data" to
                                                                         mapOf(
@@ -206,7 +206,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
     }
 
     fun drawOnImage(imageView: CircleView, coord: PointF) {
-        addPin(mapOf("data" to mapOf("x" to coord.x.toDouble(), "y" to coord.y.toDouble())))
+        onAddPin(mapOf("data" to mapOf("x" to coord.x.toDouble(), "y" to coord.y.toDouble())))
     }
 
     private fun renderPage(context: Context, filePath: String, pageIndex: Int): Bitmap? {

@@ -21,9 +21,6 @@ public class ExpoPdfViewerModule: Module {
       "PI": Double.pi
     ])
 
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
-
     // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
     Function("hello") {
       return "Hello world! 👋"
@@ -41,6 +38,7 @@ public class ExpoPdfViewerModule: Module {
     // Enables the module to be used as a native view. Definition components that are accepted as part of the
     // view definition: Prop, Events.
     View(ExpoPdfViewer.self) {
+      Events("onAddPin", "onClickPin")
       // Defines a setter for the `name` prop.
       Prop("name") { (view: ExpoPdfViewer, prop: String) in
         view.updateLabelText(with: prop)
@@ -49,14 +47,13 @@ public class ExpoPdfViewerModule: Module {
         print("Updating file source: " + prop)
         view.updateFileSource(with: prop)
       }
-      Prop("pins") { (view: ExpoPdfViewer, pins: [Pin]) in
+      Prop("pins") { (view: ExpoPdfViewer, pins: [CGPoint]) in
         let pinDescriptions = pins.map { pin in
           return "(\(pin.x), \(pin.y))"
         }.joined(separator: ", ")
         print("pins prop changed: [\(pinDescriptions)]")
-        // view.updatePins(with: pins)
+        view.updatePins(with: pins)
       }
-      Events("addPin")
     }
     //     // Now trigger the PDF update in the view
     //

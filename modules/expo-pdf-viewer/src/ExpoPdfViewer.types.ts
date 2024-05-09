@@ -6,7 +6,7 @@ export type ExpoPdfViewerProps = {
   name: string;
   fileSource: string;
   style: any;
-  clickPin: (event: any) => void;
-  addPin: (event: any) => void;
+  onClickPin: (event: any) => void;
+  onAddPin: (event: any) => void;
   pins: { x: number; y: number }[];
 };
