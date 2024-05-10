@@ -1,7 +1,7 @@
 import ProjectScreen from "src/features/project/screens/ProjectScreen";
 import ProjectsScreen from "src/features/projects/screens/ProjectsScreen";
-import WorkspacesScreen from "src/features/teams/screens/WorkspacesScreen";
-import AcceptInviteScreen from "src/features/teams/screens/AcceptInviteScreen";
+import WorkspacesScreen from "src/features/teams/Workspaces/screen";
+import AcceptInviteScreen from "src/features/teams/AcceptInvitation/screen";
 import { createStackNavigator } from "@react-navigation/stack";
 import { DefaultHeaderRight } from "src/components/DropdownMenu";
 

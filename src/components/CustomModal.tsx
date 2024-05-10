@@ -6,14 +6,16 @@ export const CustomModal = ({
   title,
   body,
   downButtons,
+  onOpenChange,
 }: {
   trigger: JSX.Element;
   title: string;
   body: JSX.Element;
   downButtons: JSX.Element;
+  onOpenChange?: (isOpen: boolean) => void;
 }) => {
   return (
-    <Dialog modal>
+    <Dialog modal onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Adapt when="sm" platform="touch">
         <Sheet animation="medium" zIndex={200000} modal dismissOnSnapToBottom>
