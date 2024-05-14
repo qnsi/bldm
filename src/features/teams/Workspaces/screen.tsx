@@ -35,7 +35,7 @@ export default function WorkspacesScreen({ navigation }) {
         navigation={navigation}
         query={getWorkspacesQuery}
       />
-      <AddNewTeamDialog mutation={saveWorkspacesMutation} />
+      <AddNewTeamDialog mutation={saveWorkspaceMutation} />
       <AddNewTeam saveNewTeam={saveNewTeam} />
     </View>
   );

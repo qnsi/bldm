@@ -177,7 +177,6 @@ export function AuthScreen() {
       </View>
     );
   }
-  return <>{/* Implement Android Auth options. */}</>;
 }
 
 const styles = StyleSheet.create({

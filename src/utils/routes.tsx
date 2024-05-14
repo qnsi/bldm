@@ -1,5 +1,5 @@
-import ProjectScreen from "src/features/project/screens/ProjectScreen";
-import ProjectsScreen from "src/features/projects/screens/ProjectsScreen";
+import ProjectScreen from "src/features/project/screen";
+import ProjectsScreen from "src/features/projects/screen";
 import WorkspacesScreen from "src/features/teams/Workspaces/screen";
 import AcceptInviteScreen from "src/features/teams/AcceptInvitation/screen";
 import { createStackNavigator } from "@react-navigation/stack";
