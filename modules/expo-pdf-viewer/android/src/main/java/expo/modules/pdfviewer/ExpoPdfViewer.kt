@@ -28,6 +28,8 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private val sCenter = PointF()
     private val vCenter = PointF()
     private val paint = Paint()
+    private var renderedPageWidth: Int = 0
+    private var renderedPageHeight: Int = 0
     val circlePoints = mutableListOf<PointF>()
 
     init {
@@ -63,11 +65,19 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
         // canvas.drawCircle(vCenter.x, vCenter.y, radius, paint)
 
         for (point in circlePoints) {
-            val viewCoord = sourceToViewCoord(point) ?: continue
+            val originalX = (point.x * renderedPageWidth ) / 1000
+            val originalY = (point.y * renderedPageHeight ) / 1000
+            val originalPoint = PointF(originalX, originalY)
+            val viewCoord = sourceToViewCoord(originalPoint) ?: continue
             paint.strokeWidth = strokeWidth.toFloat()
             paint.color = android.graphics.Color.argb(255, 51, 181, 229)
             canvas.drawCircle(viewCoord.x, viewCoord.y, radius, paint)
         }
+    }
+
+    fun updateDimensions(height: Int, width: Int) {
+        renderedPageWidth = width
+        renderedPageHeight = height
     }
 
     fun addCirclePoint(sPin: PointF) {
@@ -82,6 +92,8 @@ class CircleView @JvmOverloads constructor(context: Context, attrs: AttributeSet
 }
 
 class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
+    private var renderedPageWidth: Int = 0
+    private var renderedPageHeight: Int = 0
     val onAddPin by EventDispatcher()
     val onClickPin by EventDispatcher()
     fun updatePins(pins: List<Pin>?) {
@@ -92,6 +104,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
         if (pins == null) {
             return
         }
+        imageView.updateDimensions(renderedPageHeight, renderedPageWidth)
         for (pin in pins) {
             imageView.addCirclePoint(PointF(pin.x.toFloat(), pin.y.toFloat()))
         }
@@ -133,7 +146,15 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                                     println("onLongPress triggered")
                                     e?.let { event ->
                                         val sCoord = imageView.viewToSourceCoord(event.x, event.y)
-                                        sCoord?.let { coord -> drawOnImage(imageView, coord) }
+                                        sCoord?.let { coord ->
+                                            val mappedX = (coord.x.toDouble() / renderedPageWidth) * 1000
+                                            val mappedY = (coord.y.toDouble() / renderedPageHeight) * 1000
+                                            val mappedCoord = PointF(mappedX.toFloat(), mappedY.toFloat())
+                                            println("sCoord clicked: ${sCoord}")
+                                            println("mappedX clicked: ${mappedX}")
+                                            println("mappedY clicked: ${mappedY}")
+                                            drawOnImage(imageView, mappedCoord) 
+                                        }
                                     }
                                 }
 
@@ -145,15 +166,17 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                                         if (sCoord == null) {
                                             return true
                                         }
+                                        val mappedX = (sCoord.x.toDouble() / renderedPageWidth) * 1000
+                                        val mappedY = (sCoord.y.toDouble() / renderedPageHeight) * 1000
                                         for (point in imageView.circlePoints) {
                                             val distance =
                                                     Math.sqrt(
                                                             Math.pow(
-                                                                    (sCoord.x - point.x).toDouble(),
+                                                                    (mappedX - point.x).toDouble(),
                                                                     2.0
                                                             ) +
                                                                     Math.pow(
-                                                                            (sCoord.y - point.y)
+                                                                            (mappedY - point.y)
                                                                                     .toDouble(),
                                                                             2.0
                                                                     )
@@ -215,6 +238,10 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
         val screenWidth = metrics.widthPixels
         val screenHeight = metrics.heightPixels
 
+        println("screenWidth, : $screenWidth")
+        println("screenHeight, : $screenHeight")
+
+
         return try {
             // Kotlin's use function automatically manages the closing of resources
             ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use {
@@ -226,15 +253,22 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
 
                     return pdfRenderer.openPage(pageIndex).use { page ->
                         val scale = screenWidth.toFloat() / page.width
+                        println("page.width, : ${page.width}")
                         val scaledHeight = (page.height * scale).toInt()
+                        println("page.height, : ${page.height}")
+                        println("scaledHeight, : $scaledHeight")
+                        renderedPageWidth = screenWidth
+                        renderedPageHeight = scaledHeight
 
                         val pdfPageBitmap = Bitmap.createBitmap(screenWidth, scaledHeight, Bitmap.Config.ARGB_8888)
                         page.render(pdfPageBitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-                        val finalBitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888)
+                        // val finalBitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888)
+                        val finalBitmap = Bitmap.createBitmap(screenWidth, scaledHeight, Bitmap.Config.ARGB_8888)
                         val canvas = Canvas(finalBitmap)
-                        canvas.drawColor(Color.TRANSPARENT)
-                        canvas.drawBitmap(pdfPageBitmap, 0f, ((screenHeight - scaledHeight) / 2).toFloat(), null)
+                        canvas.drawColor(Color.GRAY)
+                         // po co to bylo? zeby bylo wyswietlone na srodku?     
+                        canvas.drawBitmap(pdfPageBitmap, 0f, 0f, null)
 
                         return finalBitmap // This is your final bitmap with transparent padding
                     }

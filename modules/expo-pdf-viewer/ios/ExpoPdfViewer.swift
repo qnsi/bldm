@@ -20,6 +20,8 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
     private var fileUrlString: String = ""
     private var pdfView = PDFView()
     private var statePins: [CGPoint] = []
+    private var renderedPageWidth: CGFloat = 0
+    private var renderedPageHeight: CGFloat = 0
     let onAddPin = EventDispatcher()
     let onClickPin = EventDispatcher()
 
@@ -45,21 +47,6 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             pdfView.document = document
         }
     }
-
-    // Add a long press gesture recognizer to the PDFView
-    // print("Adding long press gesture recognizer")
-    //     let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-    //     pdfView.addGestureRecognizer(longPressRecognizer)
-
-    // clipsToBounds = true
-    //         label = UILabel()
-    //     label.frame = self.bounds // Adjust the frame as needed
-    //     label.text = "Hello World"
-    //     label.textAlignment = .center
-    //     label.autoresizingMask = [.flexibleWidth, .flexibleHeight] // For auto-resizing (optional)
-    //     
-    //     // Add the label to your view
-    //     self.addSubview(label)
   }
 
   @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
@@ -67,8 +54,17 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
         if gestureRecognizer.state == .began {
             let location = gestureRecognizer.location(in: gestureRecognizer.view)
             guard let page = pdfView.page(for: location, nearest: true) else { return }
+            // let mappedX = (location.x / pdfView.frame.width) * 1000
+            // let mappedY = (location.y / pdfView.frame.height) * 1000
+            print("long pressed on : renderedPageHeight: ", renderedPageHeight)
+            print("long pressed on : renderedPageWidth: ", renderedPageWidth)
             let locationOnPage = pdfView.convert(location, to: page)
-            self.onAddPin(["data": ["x": locationOnPage.x, "y": locationOnPage.y]])
+            let mappedX = (locationOnPage.x / renderedPageWidth) * 1000
+            let mappedY = 1000 - ((locationOnPage.y / renderedPageHeight) * 1000)
+            print("long pressed on : x: ", locationOnPage.x, " y: ", locationOnPage.y)
+            print("long pressed on : mappedX: ", mappedX)
+            print("long pressed on : mappedY: ", mappedY)
+            self.onAddPin(["data": ["x": mappedX, "y": mappedY]])
             // addAnnotation(at: location)
          }
     }
@@ -80,14 +76,16 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             
             // Convert the view coordinates into page coordinates
             if let page = pdfView.page(for: locationInView, nearest: true) {
-            let locationInPage = pdfView.convert(locationInView, to: page)
+            let locationOnPage = pdfView.convert(locationInView, to: page)
+            let mappedX = (locationOnPage.x / renderedPageWidth) * 1000
+            let mappedY = 1000 - ((locationOnPage.y / renderedPageHeight) * 1000)
                 
                 for pin in statePins {
                     print("pin.x", pin.x)
                     print("pin.y", pin.y)
                     let distance = sqrt(
-                        pow(Double(locationInPage.x - pin.x), 2.0) +
-                        pow(Double(locationInPage.y - pin.y), 2.0)
+                        pow(Double(mappedX - pin.x), 2.0) +
+                        pow(Double(mappedY - pin.y), 2.0)
                     )
                     print("distance: ", distance)
                     if distance < 40 {
@@ -99,7 +97,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
                 
                 
                 // Here, you can handle the tap as needed
-                print("Single tap at page coordinates: \(locationInPage)")
+                print("Single tap at page coordinates: \(locationOnPage)")
                 // Example: Add annotation or perform other actions
             }
         }
@@ -118,7 +116,11 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             print("updatePins triggered")
             print("Pins: \(pins)")
             for pin in pins {
-                let circleBounds = CGRect(x: pin.x-10, y: pin.y-10, width: 20, height: 20)
+
+                let originalX = (pin.x / 1000) * renderedPageWidth
+                let originalY = renderedPageHeight - ((pin.y / 1000) * renderedPageHeight)
+
+                let circleBounds = CGRect(x: originalX-10, y: originalY-10, width: 20, height: 20)
                 let circleAnnotation = PDFAnnotation(bounds: circleBounds, forType: .circle, withProperties: nil)
                 
                 circleAnnotation.color = .red
@@ -139,6 +141,17 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
         if let document = PDFDocument(url: url) {
             print("Setting document correctly")
             pdfView.document = document
+
+            if let page = pdfView.document?.page(at: 0) {
+                // renderedPageWidth = page.bounds(for: pdfView.displayBox).width
+                // renderedPageHeight = page.bounds(for: pdfView.displayBox).height
+                let pageBounds = page.bounds(for: pdfView.displayBox)
+                    renderedPageWidth = pageBounds.width
+                    renderedPageHeight = pageBounds.height            
+
+                renderedPageWidth = page.bounds(for: .mediaBox).width
+                renderedPageHeight = page.bounds(for: .mediaBox).height
+            }
 
             print("Adding long press gesture recognizer")
             let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
