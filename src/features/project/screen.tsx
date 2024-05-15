@@ -6,13 +6,14 @@ import { supabase } from "src/utils/supabase";
 import { decode } from "base64-arraybuffer";
 import { Project } from "../projects/model";
 import { Workspace } from "../teams/Workspaces/models";
-import { Pin } from "./models";
+import { Pin, hardcodeLayers } from "./models";
 import { useHeader } from "./hooks/useHeader";
 import { EditPinModal } from "./components/EditPinModal";
 import { AddNewPinModal } from "./components/AddNewPinModal";
 import { UploadNewPlanDialog } from "./components/UploadNewPlanDialog";
 import { useFetchPlanPdf, useGetPlans } from "./api";
 import { SelectPlan } from "./components/SelectPlan";
+import { SelectLayer } from "./components/SelectLayer";
 
 export default function ProjectScreen({ route, navigation }) {
   const project = route.params.project as Project;
@@ -38,11 +39,14 @@ export default function ProjectScreen({ route, navigation }) {
     setPins,
   );
 
+  const [selectedLayerId, setSelectedLayerId] = React.useState<number>(0);
+  const layers = hardcodeLayers;
+
   useEffect(() => {
     if (!fileSource) return;
     // we want to remount pdf viewer every time file source changes
     setHackKey((prev) => prev + 1);
-  }, [fileSource]);
+  }, [fileSource, selectedLayerId]);
 
   const PdfResource = {
     uri: fileSource,
@@ -70,7 +74,7 @@ export default function ProjectScreen({ route, navigation }) {
           task_name: taskName,
           note,
           is_done: isDone,
-          // TODO:
+          layer_id: selectedLayerId,
           plan_id: selectedPlanId,
         },
       ])
@@ -132,6 +136,16 @@ export default function ProjectScreen({ route, navigation }) {
   };
 
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
+  const selectedLayer = layers.find((layer) => layer.id === selectedLayerId);
+
+  const pinsForLayer =
+    selectedLayerId === 0
+      ? pins
+      : pins.filter((pin) => pin.layer_id === selectedLayerId);
+
+  console.log("pins: ", pins);
+  console.log("pinsForLayer: ", pinsForLayer);
+  console.log("selectedLayerId: ", selectedLayerId);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -141,11 +155,16 @@ export default function ProjectScreen({ route, navigation }) {
         plans={plans}
         setSelectedPlanId={setSelectedPlanId}
       />
+      <SelectLayer
+        selectedLayer={selectedLayer}
+        layers={layers}
+        setSelectedLayerId={setSelectedLayerId}
+      />
 
       {fileSource && (
         <ExpoPdfViewer
           key={hackKey}
-          pins={pins}
+          pins={pinsForLayer}
           style={{ flex: 1 }}
           onAddPin={handleLongTap}
           onClickPin={clickPin}

@@ -95,6 +95,7 @@ export const useFetchPlanPdf = (
             note: pin.note,
             planId: pin.plan_id,
             taskName: pin.task_name,
+            layer_id: pin.layer_id,
             x: pin.x,
             y: pin.y,
           })),

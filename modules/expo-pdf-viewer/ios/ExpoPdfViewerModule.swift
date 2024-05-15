@@ -48,6 +48,7 @@ public class ExpoPdfViewerModule: Module {
         view.updateFileSource(with: prop)
       }
       Prop("pins") { (view: ExpoPdfViewer, pins: [CGPoint]) in
+        view.statePins = pins
         let pinDescriptions = pins.map { pin in
           return "(\(pin.x), \(pin.y))"
         }.joined(separator: ", ")

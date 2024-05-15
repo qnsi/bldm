@@ -100,6 +100,7 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
         println("updatePins triggered. Pins: $pins")
         val imageView = this.getChildAt(0) as CircleView
         imageView.circlePoints.clear()
+        println("imageView.circlePoints ${imageView.circlePoints}")
 
         if (pins == null) {
             return

@@ -19,7 +19,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
     private var label: UILabel!
     private var fileUrlString: String = ""
     private var pdfView = PDFView()
-    private var statePins: [CGPoint] = []
+    var statePins: [CGPoint] = []
     private var renderedPageWidth: CGFloat = 0
     private var renderedPageHeight: CGFloat = 0
     let onAddPin = EventDispatcher()
@@ -109,7 +109,6 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
 
     func updatePins(with pins: [CGPoint]) {
         // Clean previous circles
-        self.statePins = pins
         if (pdfView.document != nil) {
             guard let pdfPage = pdfView.currentPage else { return }
             pdfPage.annotations.forEach { pdfPage.removeAnnotation($0) }
@@ -165,6 +164,8 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
 
             print("Testing addPin event dispatching")
             print("Testing addPin Event dispatchered finished")
+
+            updatePins(with: statePins)
 
         } else {
             print("Could not load document.")
