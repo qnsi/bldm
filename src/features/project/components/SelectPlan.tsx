@@ -28,6 +28,7 @@ export const SelectPlan = ({
   if (!selectedPlan || plans.length === 0 || !Array.isArray(plans)) {
     return <Text>Loading...</Text>;
   }
+
   return (
     <>
       <Label

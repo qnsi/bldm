@@ -1,4 +1,4 @@
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Text } from "react-native";
 import React, { useEffect } from "react";
 
 import { ExpoPdfViewer } from "modules/expo-pdf-viewer";
@@ -16,6 +16,7 @@ import { SelectPlan } from "./components/SelectPlan";
 import { SelectLayer } from "./components/SelectLayer";
 import { ToggleDone } from "./components/ToggleDone";
 import { useQueryClient } from "@tanstack/react-query";
+import { Spinner, XStack, YStack } from "tamagui";
 
 export default function ProjectScreen({ route, navigation }) {
   const project = route.params.project as Project;
@@ -191,40 +192,53 @@ export default function ProjectScreen({ route, navigation }) {
       onTouchStart={() => setDropdownVisible(false)}
     >
       <UploadNewPlanDialog upload={uploadNewPlan} />
-      <SelectPlan
-        selectedPlan={selectedPlan}
-        plans={plans}
-        setSelectedPlanId={setSelectedPlanId}
-      />
-      <SelectLayer
-        selectedLayer={selectedLayer}
-        layers={layers}
-        setSelectedLayerId={setSelectedLayerId}
-      />
-      <ToggleDone showDone={showDone} setShowDone={setShowDone} />
-      {fileSource && (
-        <ExpoPdfViewer
-          key={hackKey}
-          pins={pinsForLayerAndChecked}
-          style={{ flex: 1 }}
-          onAddPin={handleLongTap}
-          onClickPin={clickPin}
-          fileSource={fileSource}
-          name="Hello"
-        />
+      {getPlansQuery.isLoading && <Spinner size={"large"} />}
+      {getPlansQuery.isError && <Text>Cos poszlo nie tak</Text>}
+      {getPlansQuery.isFetched && plans.length === 0 && (
+        <YStack alignItems={"center"}>
+          <XStack alignItems={"center"}>
+            <Text>Brak planow do wyswietlenia. Dodaj nowy</Text>
+          </XStack>
+        </YStack>
       )}
-      <AddNewPinModal
-        isVisible={isVisible}
-        onClose={onClose}
-        addNewPin={addNewPin}
-      />
-      <EditPinModal
-        isVisible={editingPinVisible}
-        pinId={editingPinId}
-        pins={pins}
-        onClose={onClose}
-        updatePin={updatePin}
-      />
+      {getPlansQuery.isFetched && plans.length > 0 && (
+        <>
+          <SelectPlan
+            selectedPlan={selectedPlan}
+            plans={plans}
+            setSelectedPlanId={setSelectedPlanId}
+          />
+          <SelectLayer
+            selectedLayer={selectedLayer}
+            layers={layers}
+            setSelectedLayerId={setSelectedLayerId}
+          />
+          <ToggleDone showDone={showDone} setShowDone={setShowDone} />
+          {fileSource && (
+            <ExpoPdfViewer
+              key={hackKey}
+              pins={pinsForLayerAndChecked}
+              style={{ flex: 1 }}
+              onAddPin={handleLongTap}
+              onClickPin={clickPin}
+              fileSource={fileSource}
+              name="Hello"
+            />
+          )}
+          <AddNewPinModal
+            isVisible={isVisible}
+            onClose={onClose}
+            addNewPin={addNewPin}
+          />
+          <EditPinModal
+            isVisible={editingPinVisible}
+            pinId={editingPinId}
+            pins={pins}
+            onClose={onClose}
+            updatePin={updatePin}
+          />
+        </>
+      )}
     </SafeAreaView>
   );
 }
