@@ -4,8 +4,8 @@ import {
   StyleSheet,
   AppState,
   Alert,
-  Button,
   TextInput,
+  Image,
 } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { supabase } from "src/utils/supabase";
@@ -15,6 +15,8 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import React, { useState } from "react";
+import { Fieldset, Input, Label, Button } from "tamagui";
+import { colors } from "src/styles/colors";
 
 AppState.addEventListener("change", (state) => {
   if (state === "active") {
@@ -58,36 +60,50 @@ export function AuthScreen() {
 
   const EmailAuth = (
     <View style={styles.email}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TextInput
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          placeholder="email@address.com"
-          autoCapitalize={"none"}
-        />
+      <View style={styles.mt20}>
+        <Fieldset>
+          <Label justifyContent="flex-end" htmlFor="name">
+            Email
+          </Label>
+          <Input
+            id="email"
+            defaultValue=""
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize={"none"}
+          />
+        </Fieldset>
       </View>
-      <View style={styles.verticallySpaced}>
-        <TextInput
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={true}
-          placeholder="Password"
-          autoCapitalize={"none"}
-        />
+      <View>
+        <Fieldset>
+          <Label justifyContent="flex-end" htmlFor="password">
+            Hasło
+          </Label>
+          <Input
+            id="password"
+            defaultValue=""
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+            autoCapitalize={"none"}
+          />
+        </Fieldset>
       </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+      <View style={styles.buttons}>
         <Button
-          title="Sign in"
+          style={[styles.button, styles.signInButton]}
           disabled={loading}
           onPress={() => signInWithEmail()}
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
+        >
+          Zaloguj
+        </Button>
         <Button
-          title="Sign up"
+          style={[styles.button, styles.signUpButton]}
           disabled={loading}
           onPress={() => signUpWithEmail()}
-        />
+        >
+          Zarejestruj
+        </Button>
       </View>
     </View>
   );
@@ -95,11 +111,16 @@ export function AuthScreen() {
   if (Platform.OS === "ios") {
     return (
       <View style={styles.container}>
+        <Image
+          style={styles.image}
+          source={require("../../../../assets/build-me-logo.png")}
+        />
         {EmailAuth}
         <AppleAuthentication.AppleAuthenticationButton
           buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
           buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-          cornerRadius={5}
+          cornerRadius={9}
+          style={styles.appleSignInButton}
           onPress={async () => {
             try {
               const credential = await AppleAuthentication.signInAsync({
@@ -140,8 +161,11 @@ export function AuthScreen() {
       webClientId:
         "1066423396502-jh9qp1i0djpb2nu9f2gbnesf7d5lcem4.apps.googleusercontent.com",
     });
+
+    console.log("image: ", require("../../../../assets/build-me-logo.png"));
     return (
       <View style={styles.container}>
+        <Image source={require("../../../../assets/build-me-logo.png")} />
         {EmailAuth}
         <GoogleSigninButton
           size={GoogleSigninButton.Size.Wide}
@@ -182,18 +206,35 @@ export function AuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
+    backgroundColor: colors.backgroundDark,
+  },
+  image: {
+    marginTop: 100,
+    width: 250,
+    height: 250,
   },
   email: {
     width: "70%",
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: "stretch",
-  },
   mt20: {
     marginTop: 20,
+  },
+  buttons: {
+    marginTop: 10,
+  },
+  button: { marginBottom: 10 },
+  signUpButton: {
+    color: colors.white,
+    backgroundColor: colors.action,
+  },
+  signInButton: {
+    color: colors.white,
+    backgroundColor: colors.action,
+  },
+  appleSignInButton: {
+    width: "70%",
+    height: 44,
   },
 });

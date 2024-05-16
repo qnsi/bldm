@@ -90,7 +90,6 @@ const RenderWorkspaces = ({
                     ? `Konto osobiste: ${item.name}`
                     : item.name}
                 </Text>
-                <View style={{ flex: 1, flexDirection: "row" }}></View>
               </View>
             </Pressable>
           </View>
@@ -133,7 +132,7 @@ const AddNewTeam = ({
         setError("");
       }}
       trigger={
-        <Button size="$5" themeInverse={true}>
+        <Button style={styles.addNewTeamButton} size="$5" themeInverse={true}>
           Dodaj nowy Zespol
         </Button>
       }

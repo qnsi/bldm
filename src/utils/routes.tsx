@@ -8,7 +8,12 @@ const Stack = createStackNavigator();
 
 export const ScreenNavigator = () => {
   const screenOptions = {
+    headerStyle: {
+      backgroundColor: "#FFF8EC",
+    },
     headerTitle: "BUILD ME",
+    headerShadowVisible: false,
+    headerPressColor: "#658F72",
   };
 
   return (

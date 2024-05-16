@@ -3,8 +3,9 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 20,
-    marginLeft: 20,
+    backgroundColor: "#FFF8EC",
+    paddingTop: 20,
+    paddingLeft: 20,
   },
   header: {
     fontSize: 20,
