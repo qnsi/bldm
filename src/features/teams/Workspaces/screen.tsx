@@ -17,9 +17,11 @@ import { styles } from "./style";
 import { useGetWorkspaces, useSaveWorkspace } from "./api";
 import { Workspace } from "./models";
 import { UseMutationResult } from "@tanstack/react-query";
+import { DropdownElement, HeaderRight } from "src/components/DropdownMenu";
 
 export default function WorkspacesScreen({ navigation }) {
   const { workspaces, getWorkspacesQuery } = useGetWorkspaces();
+  const [dropdownVisible, setDropdownVisible] = React.useState(false);
   const saveWorkspaceMutation = useSaveWorkspace();
   console.log("WorkspacesScreen: useEffect workspaces: ", workspaces);
 
@@ -27,8 +29,28 @@ export default function WorkspacesScreen({ navigation }) {
     saveWorkspaceMutation.mutate(newTeamName);
   };
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <HeaderRight
+          dropdownVisible={dropdownVisible}
+          setDropdownVisible={setDropdownVisible}
+          dropDownElements={
+            <DropdownElement
+              onPress={() => supabase.auth.signOut()}
+              text={"Sign out"}
+            />
+          }
+        />
+      ),
+    });
+  }, [navigation, dropdownVisible, setDropdownVisible]);
+
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onTouchStart={() => setDropdownVisible(false)}
+    >
       <Text style={styles.header}>Zespoly</Text>
       <RenderWorkspaces
         workspaces={workspaces}

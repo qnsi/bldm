@@ -31,7 +31,7 @@ export default function ProjectScreen({ route, navigation }) {
   const [hackKey, setHackKey] = React.useState(0);
 
   const queryClient = useQueryClient();
-  useHeader(navigation, project, workspace);
+  const setDropdownVisible = useHeader(navigation, project, workspace);
   const { plans, getPlansQuery } = useGetPlans(project);
   const { fetchPins } = useFetchPlanPdf(
     plans,
@@ -186,7 +186,10 @@ export default function ProjectScreen({ route, navigation }) {
   console.log("selectedLayerId: ", selectedLayerId);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView
+      style={{ flex: 1 }}
+      onTouchStart={() => setDropdownVisible(false)}
+    >
       <UploadNewPlanDialog upload={uploadNewPlan} />
       <SelectPlan
         selectedPlan={selectedPlan}

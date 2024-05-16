@@ -10,15 +10,21 @@ import { useGetInvitationLink } from "../api";
 export const ProjectsHeader = ({
   workspaceAccountId,
   deleteWorkspace,
+  dropdownVisible,
+  setDropdownVisible,
 }: {
   workspaceAccountId: string;
   deleteWorkspace: () => void;
+  dropdownVisible: boolean;
+  setDropdownVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { invitationLink, getInvitationLinkQuery } =
     useGetInvitationLink(workspaceAccountId);
 
   return (
     <HeaderRight
+      dropdownVisible={dropdownVisible}
+      setDropdownVisible={setDropdownVisible}
       dropDownElements={
         <>
           <DropdownElement
@@ -27,9 +33,10 @@ export const ProjectsHeader = ({
           />
           <CustomModal
             trigger={
-              <Pressable>
-                <Text>Dodaj osoby do zespołu</Text>
-              </Pressable>
+              <DropdownElement
+                onPress={() => { }}
+                text={"Dodaj do zespołu"}
+              ></DropdownElement>
             }
             title={"Dodaj osoby do zespolu"}
             body={
@@ -46,9 +53,10 @@ export const ProjectsHeader = ({
           />
           <CustomModal
             trigger={
-              <Pressable>
-                <Text>Usun zespol</Text>
-              </Pressable>
+              <DropdownElement
+                onPress={() => { }}
+                text={"Usun zespol"}
+              ></DropdownElement>
             }
             title={"Czy na pewno chcesz usunac zespol?"}
             body={

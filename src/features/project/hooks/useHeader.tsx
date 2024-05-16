@@ -11,6 +11,7 @@ export const useHeader = (
   workspace: Workspace,
 ) => {
   const queryClient = useQueryClient();
+  const [dropdownVisible, setDropdownVisible] = useState(false);
   const removeProject = () => {
     supabase
       .from("projects")
@@ -56,6 +57,8 @@ export const useHeader = (
   const screenOptions = {
     headerRight: () => (
       <HeaderRight
+        dropdownVisible={dropdownVisible}
+        setDropdownVisible={setDropdownVisible}
         dropDownElements={
           <>
             <DropdownElement
@@ -71,5 +74,6 @@ export const useHeader = (
 
   useEffect(() => {
     navigation.setOptions(screenOptions);
-  }, [navigation]);
+  }, [navigation, dropdownVisible, setDropdownVisible]);
+  return setDropdownVisible;
 };

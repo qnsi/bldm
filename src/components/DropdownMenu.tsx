@@ -27,25 +27,15 @@ export const DropdownElement = ({
   );
 };
 
-export const DefaultHeaderRight = () => {
-  return (
-    <HeaderRight
-      dropDownElements={
-        <DropdownElement
-          onPress={() => supabase.auth.signOut()}
-          text={"Sign out"}
-        />
-      }
-    />
-  );
-};
-
 export const HeaderRight = ({
   dropDownElements,
+  setDropdownVisible,
+  dropdownVisible,
 }: {
   dropDownElements: JSX.Element;
+  setDropdownVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  dropdownVisible: boolean;
 }) => {
-  const [dropdownVisible, setDropdownVisible] = React.useState(false);
   return (
     <>
       <Pressable
@@ -70,6 +60,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "gray",
     borderRadius: 5,
+    width: 150,
   },
   dropdownItem: {
     padding: 10,

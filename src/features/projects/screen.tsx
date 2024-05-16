@@ -21,6 +21,7 @@ import { UseMutationResult } from "@tanstack/react-query";
 export default function ProjectScreen({ route, navigation }) {
   const workspace = route.params as Workspace;
   const { projects, getProjectsQuery } = useGetProjects(workspace.account_id);
+  const [dropdownVisible, setDropdownVisible] = React.useState(false);
   const thumbnails = useFetchProjectThumbnails(workspace, projects);
   const [imageBase64, setImageBase64] = React.useState<string>("");
 
@@ -41,10 +42,12 @@ export default function ProjectScreen({ route, navigation }) {
         <ProjectsHeader
           deleteWorkspace={deleteWorkspace}
           workspaceAccountId={workspace.account_id}
+          dropdownVisible={dropdownVisible}
+          setDropdownVisible={setDropdownVisible}
         />
       ),
     });
-  }, [navigation, workspace.account_id]);
+  }, [navigation, workspace.account_id, dropdownVisible, setDropdownVisible]);
 
   const saveProject = (newProjectName: string) => {
     saveProjectMutation.mutate({
@@ -54,7 +57,10 @@ export default function ProjectScreen({ route, navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onTouchStart={() => setDropdownVisible(false)}
+    >
       <Text style={styles.header}>Projekty w zespole {workspace.name}</Text>
       {getProjectsQuery.isPending && <Spinner size="large" />}
       {getProjectsQuery.isError && <Text>Cos poszlo nie tak</Text>}

@@ -3,14 +3,12 @@ import ProjectsScreen from "src/features/projects/screen";
 import WorkspacesScreen from "src/features/teams/Workspaces/screen";
 import AcceptInviteScreen from "src/features/teams/AcceptInvitation/screen";
 import { createStackNavigator } from "@react-navigation/stack";
-import { DefaultHeaderRight } from "src/components/DropdownMenu";
 
 const Stack = createStackNavigator();
 
 export const ScreenNavigator = () => {
   const screenOptions = {
     headerTitle: "BUILD ME",
-    headerRight: () => <DefaultHeaderRight />,
   };
 
   return (
