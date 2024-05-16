@@ -7,15 +7,17 @@ export const CustomModal = ({
   body,
   downButtons,
   onOpenChange,
+  isOpen,
 }: {
   trigger: JSX.Element;
   title: string;
   body: JSX.Element;
   downButtons: JSX.Element;
+  isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
 }) => {
   return (
-    <Dialog modal onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} modal onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
       <Adapt when="sm" platform="touch">
         <Sheet animation="medium" zIndex={200000} modal dismissOnSnapToBottom>
@@ -59,9 +61,9 @@ export const CustomModal = ({
           {body}
 
           <XStack alignSelf="flex-end" gap="$4">
-            <Dialog.Close displayWhenAdapted asChild>
-              {downButtons}
-            </Dialog.Close>
+            {/* <Dialog.Close displayWhenAdapted asChild> */}
+            {downButtons}
+            {/* </Dialog.Close> */}
           </XStack>
 
           <Unspaced>

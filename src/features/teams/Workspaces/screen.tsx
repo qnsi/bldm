@@ -84,14 +84,32 @@ const AddNewTeam = ({
   saveNewTeam: (newTeamName: string) => void;
 }) => {
   const [newTeamName, setNewTeamName] = React.useState<string>("");
+  const [error, setError] = React.useState<string>("");
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    if (newTeamName.length > 0) {
+      setError("");
+    }
+  }, [newTeamName]);
 
   const saveAndClean = () => {
+    if (newTeamName.length === 0) {
+      setError("Nazwa zespolu nie moze byc pusta");
+      return;
+    }
+    setIsOpen(false);
     saveNewTeam(newTeamName);
   };
 
   return (
     <CustomModal
-      onOpenChange={(isOpen) => setNewTeamName("")}
+      isOpen={isOpen}
+      onOpenChange={(isOpen) => {
+        setIsOpen(isOpen);
+        setNewTeamName("");
+        setError("");
+      }}
       trigger={
         <Button size="$5" themeInverse={true}>
           Dodaj nowy Zespol
@@ -112,6 +130,7 @@ const AddNewTeam = ({
               onChangeText={setNewTeamName}
             />
           </Fieldset>
+          <Text style={{ color: "red" }}>{error}</Text>
         </>
       }
       downButtons={

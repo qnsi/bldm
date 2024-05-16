@@ -13,6 +13,21 @@ export const UploadNewPlanDialog = ({
 }) => {
   const [newPlanName, setNewPlanName] = React.useState("");
   const [pdfBase64, setPdfBase64] = React.useState<string>("");
+  const [nameError, setNameError] = React.useState<string>("");
+  const [pdfError, setPdfError] = React.useState<string>("");
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (newPlanName.length > 0) {
+      setNameError("");
+    }
+  }, [newPlanName]);
+
+  React.useEffect(() => {
+    if (pdfBase64.length > 0) {
+      setPdfError("");
+    }
+  }, [pdfBase64]);
 
   const pickPdf = () => {
     // let result = await DocumentPicker.getDocumentAsync({
@@ -46,11 +61,32 @@ export const UploadNewPlanDialog = ({
   };
 
   const saveNewPlan = () => {
+    var validationFailed = false;
+
+    if (newPlanName.length === 0) {
+      setNameError("Nazwa planu nie moze byc pusta");
+      validationFailed = true;
+    }
+
+    if (pdfBase64.length === 0) {
+      setPdfError("Potrzebujemy planu w formacie pdf");
+      validationFailed = true;
+    }
+    if (validationFailed) return;
+    setIsOpen(false);
     upload(newPlanName, pdfBase64);
   };
 
   return (
     <CustomModal
+      isOpen={isOpen}
+      onOpenChange={(isOpen) => {
+        setIsOpen(isOpen);
+        setNewPlanName("");
+        setPdfBase64("");
+        setNameError("");
+        setPdfError("");
+      }}
       trigger={
         <TmgButton size="$5" themeInverse={true}>
           Dodaj nowy Plan
@@ -71,11 +107,13 @@ export const UploadNewPlanDialog = ({
               onChangeText={setNewPlanName}
             />
           </Fieldset>
+          <Text style={{ color: "red" }}>{nameError}</Text>
           <Fieldset gap="$4" horizontal>
             <Label width={160} justifyContent="flex-end" htmlFor="username">
               <TmgButton onPress={pickPdf}>Pick pdf from file system</TmgButton>
             </Label>
           </Fieldset>
+          <Text style={{ color: "red" }}>{pdfError}</Text>
         </>
       }
       downButtons={

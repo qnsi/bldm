@@ -9,8 +9,10 @@ import { useGetInvitationLink } from "../api";
 
 export const ProjectsHeader = ({
   workspaceAccountId,
+  deleteWorkspace,
 }: {
   workspaceAccountId: string;
+  deleteWorkspace: () => void;
 }) => {
   const { invitationLink, getInvitationLinkQuery } =
     useGetInvitationLink(workspaceAccountId);
@@ -38,6 +40,20 @@ export const ProjectsHeader = ({
                 >
                   Skopiuj link
                 </Button>
+              </>
+            }
+            downButtons={<></>}
+          />
+          <CustomModal
+            trigger={
+              <Pressable>
+                <Text>Usun zespol</Text>
+              </Pressable>
+            }
+            title={"Czy na pewno chcesz usunac zespol?"}
+            body={
+              <>
+                <Button onPress={deleteWorkspace}>Usun zespol</Button>
               </>
             }
             downButtons={<></>}

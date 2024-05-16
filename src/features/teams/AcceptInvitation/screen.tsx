@@ -25,9 +25,11 @@ export default function AcceptInviteScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      {error ? (
-        <Text style={{ color: "red" }}>{error}</Text>
-      ) : success ? (
+      {acceptInvitationMutation.isError ? (
+        <Text style={{ color: "red" }}>
+          Coś poszło nie tak. Spróbuj ponownie
+        </Text>
+      ) : acceptInvitationMutation.isSuccess ? (
         <Text style={{ color: "green" }}>Zaproszenie zaakceptowane</Text>
       ) : (
         <Text style={styles.header}>Akceptowanie zaproszenia...</Text>

@@ -11,6 +11,7 @@ import {
   Button,
 } from "react-native";
 import { modalStyles } from "../styles";
+import { Pin } from "../models";
 
 export const EditPinModal = ({
   isVisible,
@@ -18,6 +19,12 @@ export const EditPinModal = ({
   updatePin,
   pinId,
   pins,
+}: {
+  isVisible: boolean;
+  onClose: () => void;
+  pinId: number;
+  pins: Pin[];
+  updatePin: (pinId: any, taskName: any, note: any, isDone: any) => void;
 }) => {
   const [taskName, setTaskName] = React.useState("");
   const [note, setNote] = React.useState("");
@@ -34,7 +41,7 @@ export const EditPinModal = ({
   }, [pinId, pins]);
 
   const save = () => {
-    updatePin(taskName, note, isDone);
+    updatePin(pinId, taskName, note, isDone);
     setTaskName("");
     setNote("");
     setIsDone(false);
@@ -44,7 +51,7 @@ export const EditPinModal = ({
       <View style={modalStyles.modal}>
         <View style={modalStyles.modalView}>
           <View style={modalStyles.titleContainer}>
-            <Text>Dodaj nowe zadanie</Text>
+            <Text>Edytuj zadanie</Text>
             <Pressable onPress={onClose}>
               <MaterialIcons name="close" color="#000" size={22} />
             </Pressable>

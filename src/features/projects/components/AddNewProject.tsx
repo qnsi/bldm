@@ -1,34 +1,57 @@
 import { CustomModal } from "src/components/CustomModal";
-import { Image } from "react-native";
+import { Image, Text } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
 import { Button, Fieldset, Input, Label } from "tamagui";
 import React from "react";
-import { supabase } from "src/utils/supabase";
 import { styles } from "../styles";
-import { Workspace } from "../../teams/Workspaces/models";
-import { useSaveProject, useUploadProjectThumbnail } from "../api";
 
-const AddNewProject = ({ workspace }: { workspace: Workspace }) => {
+const AddNewProject = ({
+  saveProject,
+  imageBase64,
+  setImageBase64,
+}: {
+  saveProject: (newProjectName: string) => void;
+  imageBase64: string;
+  setImageBase64: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const [newProjectName, setNewProjectName] = React.useState<string>("");
   const [image, setImage] = React.useState<string>("");
-  const [imageBase64, setImageBase64] = React.useState<string>("");
+  const [nameError, setNameError] = React.useState<string>("");
+  const [imageError, setImageError] = React.useState<string>("");
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
-  const saveProjectMutation = useSaveProject({
-    imageBase64,
-    workspaceAccountId: workspace.account_id,
-  });
+  React.useEffect(() => {
+    if (newProjectName.length > 0) {
+      setNameError("");
+    }
+  }, [newProjectName]);
+
+  React.useEffect(() => {
+    if (imageBase64.length > 0) {
+      setImageError("");
+    }
+  }, [imageBase64]);
 
   const saveNewProject = () => {
     console.log("Saving new project with:");
     console.log("image: ", image);
     console.log("newProjectName: ", newProjectName);
-    console.log("workspace: ", workspace);
+    var validationFailed = false;
 
-    saveProjectMutation.mutate({
-      newProjectName,
-      workspaceAccountId: workspace.account_id,
-    });
+    if (newProjectName.length === 0) {
+      setNameError("Nazwa projektu nie moze byc pusta");
+      validationFailed = true;
+    }
+
+    if (imageBase64.length === 0) {
+      setImageError("Potrzebujemy miniaturki projektu");
+      validationFailed = true;
+    }
+    if (validationFailed) return;
+
+    setIsOpen(false);
+    saveProject(newProjectName);
   };
 
   const pickImage = async () => {
@@ -51,6 +74,15 @@ const AddNewProject = ({ workspace }: { workspace: Workspace }) => {
 
   return (
     <CustomModal
+      isOpen={isOpen}
+      onOpenChange={(isOpen) => {
+        setIsOpen(isOpen);
+        setNewProjectName("");
+        setImage("");
+        setImageBase64("");
+        setNameError("");
+        setImageError("");
+      }}
       trigger={
         <Button size="$5" themeInverse={true}>
           Dodaj nowy Projekt
@@ -71,6 +103,7 @@ const AddNewProject = ({ workspace }: { workspace: Workspace }) => {
               onChangeText={setNewProjectName}
             />
           </Fieldset>
+          <Text style={{ color: "red" }}>{nameError}</Text>
           <Fieldset gap="$4" horizontal>
             <Label width={160} justifyContent="flex-end" htmlFor="username">
               {image && (
@@ -81,6 +114,7 @@ const AddNewProject = ({ workspace }: { workspace: Workspace }) => {
               </Button>
             </Label>
           </Fieldset>
+          <Text style={{ color: "red" }}>{imageError}</Text>
         </>
       }
       downButtons={

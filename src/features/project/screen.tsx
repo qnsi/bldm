@@ -14,6 +14,8 @@ import { UploadNewPlanDialog } from "./components/UploadNewPlanDialog";
 import { useFetchPlanPdf, useGetPlans } from "./api";
 import { SelectPlan } from "./components/SelectPlan";
 import { SelectLayer } from "./components/SelectLayer";
+import { ToggleDone } from "./components/ToggleDone";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function ProjectScreen({ route, navigation }) {
   const project = route.params.project as Project;
@@ -25,8 +27,10 @@ export default function ProjectScreen({ route, navigation }) {
   const [newPin, setNewPin] = React.useState<{ x: number; y: number }>();
   const [editingPinId, setEditingPinId] = React.useState(0);
   const [editingPinVisible, setEditingPinVisible] = React.useState(false);
+  const [showDone, setShowDone] = React.useState(true);
   const [hackKey, setHackKey] = React.useState(0);
 
+  const queryClient = useQueryClient();
   useHeader(navigation, project, workspace);
   const { plans, getPlansQuery } = useGetPlans(project);
   const { fetchPins } = useFetchPlanPdf(
@@ -46,7 +50,7 @@ export default function ProjectScreen({ route, navigation }) {
     if (!fileSource) return;
     // we want to remount pdf viewer every time file source changes
     setHackKey((prev) => prev + 1);
-  }, [fileSource, selectedLayerId]);
+  }, [fileSource, selectedLayerId, showDone]);
 
   const PdfResource = {
     uri: fileSource,
@@ -85,6 +89,33 @@ export default function ProjectScreen({ route, navigation }) {
     // setPins((pins) => [...pins, newPin]);
     setNewPin(undefined);
     setIsVisible(false);
+  };
+
+  const updatePin = (
+    pinId: number,
+    taskName: string,
+    note: string,
+    isDone: boolean,
+  ) => {
+    console.log("updatePin, pinId: ", pinId);
+    console.log("updatePin, taskName: ", taskName);
+    console.log("updatePin, note: ", note);
+    console.log("updatePin, isDone: ", isDone);
+    supabase
+      .from("pins")
+      .update([
+        {
+          task_name: taskName,
+          note,
+          is_done: isDone,
+        },
+      ])
+      .eq("id", pinId)
+      .then((result) => {
+        console.log("Update result: ", result);
+        fetchPins();
+      });
+    setEditingPinVisible(false);
   };
 
   const clickPin = (event) => {
@@ -131,6 +162,7 @@ export default function ProjectScreen({ route, navigation }) {
           )
           .then((result) => {
             console.log("File upload, result: ", result);
+            queryClient.invalidateQueries({ queryKey: ["plans"] });
           });
       });
   };
@@ -143,6 +175,12 @@ export default function ProjectScreen({ route, navigation }) {
       ? pins
       : pins.filter((pin) => pin.layer_id === selectedLayerId);
 
+  const pinsForLayerAndChecked = showDone
+    ? pinsForLayer
+    : pinsForLayer.filter((pin) => !pin.isDone);
+
+  console.log("showDone: ", showDone);
+  console.log("pinsForLayerAndChecked: ", pinsForLayerAndChecked);
   console.log("pins: ", pins);
   console.log("pinsForLayer: ", pinsForLayer);
   console.log("selectedLayerId: ", selectedLayerId);
@@ -160,11 +198,11 @@ export default function ProjectScreen({ route, navigation }) {
         layers={layers}
         setSelectedLayerId={setSelectedLayerId}
       />
-
+      <ToggleDone showDone={showDone} setShowDone={setShowDone} />
       {fileSource && (
         <ExpoPdfViewer
           key={hackKey}
-          pins={pinsForLayer}
+          pins={pinsForLayerAndChecked}
           style={{ flex: 1 }}
           onAddPin={handleLongTap}
           onClickPin={clickPin}
@@ -182,7 +220,7 @@ export default function ProjectScreen({ route, navigation }) {
         pinId={editingPinId}
         pins={pins}
         onClose={onClose}
-        updatePin={() => { }}
+        updatePin={updatePin}
       />
     </SafeAreaView>
   );

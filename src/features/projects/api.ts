@@ -105,6 +105,27 @@ export const useSaveProject = ({
   });
 };
 
+export const useDeleteWorkspace = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: { workspaceId: string }) => {
+      const { data, error } = await supabase
+        .from("accounts")
+        .delete()
+        .eq("id", params.workspaceId);
+      console.log("useSaveProject, data: ", data);
+      console.log("useSaveProject, error: ", error);
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
+    },
+  });
+};
+
 export const useUploadProjectThumbnail = () => {
   const queryClient = useQueryClient();
   return useMutation({

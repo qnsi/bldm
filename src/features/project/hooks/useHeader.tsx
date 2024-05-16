@@ -3,12 +3,14 @@ import { DropdownElement, HeaderRight } from "src/components/DropdownMenu";
 import { supabase } from "src/utils/supabase";
 import { Project } from "../../projects/model";
 import { Workspace } from "../../teams/Workspaces/models";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useHeader = (
   navigation,
   project: Project,
   workspace: Workspace,
 ) => {
+  const queryClient = useQueryClient();
   const removeProject = () => {
     supabase
       .from("projects")
@@ -20,6 +22,8 @@ export const useHeader = (
           "trying to delete all project files",
           `${workspace.account_id}/${project.id}.png`,
         );
+        queryClient.invalidateQueries({ queryKey: ["projects"] });
+        navigation.navigate("Projects", workspace);
         supabase.storage
           .from("plan_thumbnails")
           .remove([`${workspace.account_id}/${project.id}.png`])
