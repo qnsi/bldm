@@ -61,7 +61,7 @@ export default function ProjectScreen({ route, navigation }) {
       style={styles.container}
       onTouchStart={() => setDropdownVisible(false)}
     >
-      <Text style={styles.header}>Projekty w zespole {workspace.name}</Text>
+      <Text style={styles.header}>{workspace.name}</Text>
       {getProjectsQuery.isPending && <Spinner size="large" />}
       {getProjectsQuery.isError && <Text>Cos poszlo nie tak</Text>}
       <FlatList

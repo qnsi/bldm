@@ -13,11 +13,12 @@ import {
   XStack,
 } from "tamagui";
 import { slugify } from "src/utils/slugify";
-import { styles } from "./style";
+import { styles } from "./styles";
 import { useGetWorkspaces, useSaveWorkspace } from "./api";
 import { Workspace } from "./models";
 import { UseMutationResult } from "@tanstack/react-query";
 import { DropdownElement, HeaderRight } from "src/components/DropdownMenu";
+import Avatar from "./components/Avatar";
 
 export default function WorkspacesScreen({ navigation }) {
   const { workspaces, getWorkspacesQuery } = useGetWorkspaces();
@@ -84,13 +85,12 @@ const RenderWorkspaces = ({
               style={styles.project}
               onPress={() => navigation.navigate("Projects", item)}
             >
-              <View style={{ flex: 1 }}>
-                <Text style={styles.workspaceName}>
-                  {item.personal_account
-                    ? `Konto osobiste: ${item.name}`
-                    : item.name}
-                </Text>
-              </View>
+              <Avatar teamName={item.name} />
+              <Text style={styles.workspaceName}>
+                {item.personal_account
+                  ? `Konto osobiste: ${item.name}`
+                  : item.name}
+              </Text>
             </Pressable>
           </View>
         )}

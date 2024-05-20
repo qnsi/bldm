@@ -84,7 +84,7 @@ const AddNewProject = ({
         setImageError("");
       }}
       trigger={
-        <Button size="$5" themeInverse={true}>
+        <Button style={styles.addNewTeamButton} size="$5" themeInverse={true}>
           Dodaj nowy Projekt
         </Button>
       }

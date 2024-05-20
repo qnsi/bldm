@@ -25,10 +25,10 @@ export const styles = StyleSheet.create({
   even: {},
   workspaceName: {
     marginBottom: 20,
-    marginTop: 20,
+    marginTop: 27,
     fontWeight: "bold",
     fontSize: 20,
-    marginLeft: 10,
+    marginLeft: 20,
   },
   thumbnail: {
     height: 50,

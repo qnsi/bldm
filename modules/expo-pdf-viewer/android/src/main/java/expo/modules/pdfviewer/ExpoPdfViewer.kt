@@ -267,7 +267,6 @@ class ExpoPdfViewer(context: Context, appContext: AppContext) : ExpoView(context
                         // val finalBitmap = Bitmap.createBitmap(screenWidth, screenHeight, Bitmap.Config.ARGB_8888)
                         val finalBitmap = Bitmap.createBitmap(screenWidth, scaledHeight, Bitmap.Config.ARGB_8888)
                         val canvas = Canvas(finalBitmap)
-                        canvas.drawColor(Color.GRAY)
                          // po co to bylo? zeby bylo wyswietlone na srodku?     
                         canvas.drawBitmap(pdfPageBitmap, 0f, 0f, null)
 

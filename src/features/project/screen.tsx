@@ -1,4 +1,4 @@
-import { SafeAreaView, Text } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 import React, { useEffect } from "react";
 
 import { ExpoPdfViewer } from "modules/expo-pdf-viewer";
@@ -16,7 +16,8 @@ import { SelectPlan } from "./components/SelectPlan";
 import { SelectLayer } from "./components/SelectLayer";
 import { ToggleDone } from "./components/ToggleDone";
 import { useQueryClient } from "@tanstack/react-query";
-import { Spinner, XStack, YStack } from "tamagui";
+import { Button, Spinner, XStack, YStack } from "tamagui";
+import { styles } from "./styles";
 
 export default function ProjectScreen({ route, navigation }) {
   const project = route.params.project as Project;
@@ -188,32 +189,49 @@ export default function ProjectScreen({ route, navigation }) {
 
   return (
     <SafeAreaView
-      style={{ flex: 1 }}
+      style={styles.container}
       onTouchStart={() => setDropdownVisible(false)}
     >
-      <UploadNewPlanDialog upload={uploadNewPlan} />
       {getPlansQuery.isLoading && <Spinner size={"large"} />}
       {getPlansQuery.isError && <Text>Cos poszlo nie tak</Text>}
       {getPlansQuery.isFetched && plans.length === 0 && (
-        <YStack alignItems={"center"}>
-          <XStack alignItems={"center"}>
-            <Text>Brak planow do wyswietlenia. Dodaj nowy</Text>
-          </XStack>
+        <YStack
+          style={{ flex: 1, justifyContent: "center" }}
+          alignItems={"center"}
+        >
+          <Text style={{ marginBottom: 20, fontSize: 20 }}>
+            Brak planow do wyswietlenia.
+          </Text>
+          <UploadNewPlanDialog
+            upload={uploadNewPlan}
+            triggerButton={
+              <Button
+                style={styles.addNewPlanButton}
+                size="$5"
+                themeInverse={true}
+              >
+                Dodaj nowy Plan
+              </Button>
+            }
+          />
         </YStack>
       )}
       {getPlansQuery.isFetched && plans.length > 0 && (
         <>
-          <SelectPlan
-            selectedPlan={selectedPlan}
-            plans={plans}
-            setSelectedPlanId={setSelectedPlanId}
-          />
-          <SelectLayer
-            selectedLayer={selectedLayer}
-            layers={layers}
-            setSelectedLayerId={setSelectedLayerId}
-          />
-          <ToggleDone showDone={showDone} setShowDone={setShowDone} />
+          <View style={styles.formContainer}>
+            <SelectPlan
+              selectedPlan={selectedPlan}
+              plans={plans}
+              setSelectedPlanId={setSelectedPlanId}
+              uploadNewPlan={uploadNewPlan}
+            />
+            <SelectLayer
+              selectedLayer={selectedLayer}
+              layers={layers}
+              setSelectedLayerId={setSelectedLayerId}
+            />
+            <ToggleDone showDone={showDone} setShowDone={setShowDone} />
+          </View>
           {fileSource && (
             <ExpoPdfViewer
               key={hackKey}

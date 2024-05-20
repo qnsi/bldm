@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
+import { colors } from "src/styles/colors";
 
 export const modalStyles = StyleSheet.create({
   modal: {
@@ -44,13 +45,21 @@ export const modalStyles = StyleSheet.create({
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    marginTop: 25,
+    backgroundColor: "#FFF8EC",
+  },
+  formContainer: {
+    marginLeft: 10,
   },
   pdf: {
     flex: 1,
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
+  },
+  addNewPlanButton: {
+    backgroundColor: colors.action,
+  },
+  addNewPlanSmallButton: {
+    marginLeft: 10,
+    backgroundColor: colors.action,
   },
 });

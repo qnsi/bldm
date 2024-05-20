@@ -62,7 +62,12 @@ export function AuthScreen() {
     <View style={styles.email}>
       <View style={styles.mt20}>
         <Fieldset>
-          <Label justifyContent="flex-end" htmlFor="name">
+          <Label
+            unstyled
+            style={styles.label}
+            justifyContent="flex-end"
+            htmlFor="name"
+          >
             Email
           </Label>
           <Input
@@ -76,7 +81,12 @@ export function AuthScreen() {
       </View>
       <View>
         <Fieldset>
-          <Label justifyContent="flex-end" htmlFor="password">
+          <Label
+            unstyled
+            style={styles.label}
+            justifyContent="flex-end"
+            htmlFor="password"
+          >
             Hasło
           </Label>
           <Input
@@ -165,7 +175,10 @@ export function AuthScreen() {
     console.log("image: ", require("../../../../assets/build-me-logo.png"));
     return (
       <View style={styles.container}>
-        <Image source={require("../../../../assets/build-me-logo.png")} />
+        <Image
+          style={styles.image}
+          source={require("../../../../assets/build-me-logo.png")}
+        />
         {EmailAuth}
         <GoogleSigninButton
           size={GoogleSigninButton.Size.Wide}
@@ -214,6 +227,10 @@ const styles = StyleSheet.create({
     marginTop: 100,
     width: 250,
     height: 250,
+  },
+  label: {
+    marginBottom: 4,
+    marginTop: 4,
   },
   email: {
     width: "70%",

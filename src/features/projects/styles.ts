@@ -1,13 +1,15 @@
 import { StyleSheet } from "react-native";
+import { colors } from "src/styles/colors";
 
 export const styles = StyleSheet.create({
   container: {
     backgroundColor: "#FFF8EC",
     flex: 1,
-    padding: 20,
+    paddingTop: 20,
+    paddingLeft: 20,
   },
   header: {
-    fontSize: 20,
+    fontSize: 40,
     fontWeight: "bold",
     margin: 10,
   },
@@ -17,18 +19,32 @@ export const styles = StyleSheet.create({
     // justifyContent: "space-between",
     // alignItems: "center",
     padding: 10,
+    borderBottomWidth: 1,
   },
   odd: {},
   even: {},
   projectName: {
     fontWeight: "bold",
-    marginTop: 5,
-    marginLeft: 10,
+    // marginTop: 5,
+    // marginLeft: 10,
+    marginBottom: 20,
+    marginTop: 10,
+    fontSize: 20,
+    marginLeft: 20,
   },
+  // borderRadius: 5,
+  // justifyContent: "center",
+  // alignItems: "center",
+  // height: 40,
+  // width: 40,
+  // marginBottom: 20,
+  // marginTop: 20,
+  // marginLeft: 10,
+  // backgroundColor: color,
   thumbnail: {
     height: 50,
     width: 50,
-    borderRadius: 10,
+    borderRadius: 5,
   },
   uploadThumbnail: {
     marginRight: 50,
@@ -42,5 +58,10 @@ export const styles = StyleSheet.create({
   },
   addNew: {
     height: "10%",
+  },
+  addNewTeamButton: {
+    marginBottom: 40,
+    marginRight: 20,
+    backgroundColor: colors.action,
   },
 });

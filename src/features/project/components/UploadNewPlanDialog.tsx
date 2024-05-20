@@ -5,11 +5,14 @@ import * as DocumentPicker from "expo-document-picker";
 
 import * as FileSystem from "expo-file-system";
 import { CustomModal } from "src/components/CustomModal";
+import { styles } from "../styles";
 
 export const UploadNewPlanDialog = ({
   upload,
+  triggerButton,
 }: {
   upload: (name: string, pdfBase64: string) => void;
+  triggerButton: React.JSX;
 }) => {
   const [newPlanName, setNewPlanName] = React.useState("");
   const [pdfBase64, setPdfBase64] = React.useState<string>("");
@@ -87,11 +90,7 @@ export const UploadNewPlanDialog = ({
         setNameError("");
         setPdfError("");
       }}
-      trigger={
-        <TmgButton size="$5" themeInverse={true}>
-          Dodaj nowy Plan
-        </TmgButton>
-      }
+      trigger={triggerButton}
       title={"Dodaj nowy plan"}
       body={
         <>
