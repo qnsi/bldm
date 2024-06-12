@@ -34,12 +34,14 @@ export default function ProjectScreen({ route, navigation }) {
 
   const deleteWorkspace = () => {
     deleteWorkspaceMutation.mutate({ workspaceId: workspace.account_id });
+    navigation.navigate("Workspaces");
   };
 
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <ProjectsHeader
+          isPrimaryOwner={workspace.is_primary_owner}
           deleteWorkspace={deleteWorkspace}
           workspaceAccountId={workspace.account_id}
           dropdownVisible={dropdownVisible}

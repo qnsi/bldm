@@ -26,11 +26,15 @@ export const useGetWorkspaces = () => {
 
   const query = useQuery({ queryKey: ["workspaces"], queryFn: getWorkspaces });
 
+  console.log("Get workspaces data:", query.data);
+  console.log("Get workspaces error:", query.error);
+
   const workspaces = query.data
     ? query.data.map((workspace) => {
       return {
         name: workspace.name,
         account_id: workspace.account_id,
+        is_primary_owner: workspace.is_primary_owner,
         personal_account: workspace.personal_account,
       } as Workspace;
     })

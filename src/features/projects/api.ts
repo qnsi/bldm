@@ -110,11 +110,12 @@ export const useDeleteWorkspace = () => {
   return useMutation({
     mutationFn: async (params: { workspaceId: string }) => {
       const { data, error } = await supabase
+        .schema("basejump")
         .from("accounts")
         .delete()
         .eq("id", params.workspaceId);
-      console.log("useSaveProject, data: ", data);
-      console.log("useSaveProject, error: ", error);
+      console.log("useDeleteWorkspace, data: ", data);
+      console.log("useDeleteWorkspace, error: ", error);
       if (error) {
         throw new Error(error.message);
       }

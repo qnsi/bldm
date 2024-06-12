@@ -1,5 +1,6 @@
 import { X } from "@tamagui/lucide-icons";
-import { Adapt, Button, Dialog, Sheet, Unspaced, XStack } from "tamagui";
+import { StyleSheet } from "react-native";
+import { Adapt, Button, Dialog, Sheet, Unspaced, View, XStack } from "tamagui";
 
 export const CustomModal = ({
   trigger,

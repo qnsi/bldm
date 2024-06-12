@@ -5,6 +5,10 @@ npx expo prebuild --platform android
 
 eas build -p android --profile preview --local
 
+### Run just bundler
+
+npx expo start --dev-client
+
 ## supabase
 
 generate types:

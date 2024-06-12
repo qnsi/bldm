@@ -6,6 +6,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { CustomModal } from "src/components/CustomModal";
 import { styles } from "../styles";
+import { Upload } from "@tamagui/lucide-icons";
 
 export const UploadNewPlanDialog = ({
   upload,
@@ -16,6 +17,7 @@ export const UploadNewPlanDialog = ({
 }) => {
   const [newPlanName, setNewPlanName] = React.useState("");
   const [pdfBase64, setPdfBase64] = React.useState<string>("");
+  const [pdfName, setPdfName] = React.useState<string>("");
   const [nameError, setNameError] = React.useState<string>("");
   const [pdfError, setPdfError] = React.useState<string>("");
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
@@ -43,6 +45,7 @@ export const UploadNewPlanDialog = ({
     }).then((result) => {
       console.log("result", result);
       const file = result.assets[0];
+      setPdfName(file.name);
       console.log("file", file);
       // FileSystem.readAsStringAsync(file.uri, {
       FileSystem.readAsStringAsync(file.uri, {
@@ -94,12 +97,11 @@ export const UploadNewPlanDialog = ({
       title={"Dodaj nowy plan"}
       body={
         <>
-          <Fieldset gap="$4" horizontal>
+          <Fieldset gap="$1">
             <Label width={160} justifyContent="flex-end" htmlFor="name">
               Nazwa Planu
             </Label>
             <Input
-              flex={1}
               id="name"
               defaultValue=""
               value={newPlanName}
@@ -107,10 +109,31 @@ export const UploadNewPlanDialog = ({
             />
           </Fieldset>
           <Text style={{ color: "red" }}>{nameError}</Text>
-          <Fieldset gap="$4" horizontal>
-            <Label width={160} justifyContent="flex-end" htmlFor="username">
-              <TmgButton onPress={pickPdf}>Pick pdf from file system</TmgButton>
-            </Label>
+          <Fieldset gap="$1" horizontal>
+            {pdfBase64 && (
+              <>
+                <Text style={{ width: 75 }}>{pdfName}</Text>
+                <TmgButton
+                  width={"75%"}
+                  style={{ margin: 20 }}
+                  onPress={pickPdf}
+                >
+                  Wgraj pdf
+                </TmgButton>
+              </>
+            )}
+            {!pdfBase64 && (
+              <>
+                <Upload margin={"$3"} size={"$4"} />
+                <TmgButton
+                  style={{ margin: 20 }}
+                  width={"75%"}
+                  onPress={pickPdf}
+                >
+                  Wgraj pdf
+                </TmgButton>
+              </>
+            )}
           </Fieldset>
           <Text style={{ color: "red" }}>{pdfError}</Text>
         </>

@@ -121,6 +121,31 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
 
                 let circleBounds = CGRect(x: originalX-10, y: originalY-10, width: 20, height: 20)
                 let circleAnnotation = PDFAnnotation(bounds: circleBounds, forType: .circle, withProperties: nil)
+
+                // switch pin.layer_id {
+                //     case 0:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#ff5f5b")
+                //     case 1:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#ffa13d")
+                //     case 2:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#ffdd4f")
+                //     case 3:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#aff026")
+                //     case 4:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#3effd2")
+                //     case 5:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#738dfd")
+                //     case 6:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#414dfd")
+                //     case 7:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#953cb9")
+                //     case 8:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#a92c7a")
+                //     case 9:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#ff5f5b")
+                //     case 9:
+                //         circleAnnotation.color = hexStringToUIColor(hex: "#dbdbdb")
+                // }
                 
                 circleAnnotation.color = .red
                 circleAnnotation.border = PDFBorder()
@@ -181,4 +206,26 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
   //       label.frame = bounds
   //   }
     }
+
+    func hexStringToUIColor (hex:String) -> UIColor {
+    var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+    if (cString.hasPrefix("#")) {
+        cString.remove(at: cString.startIndex)
+    }
+
+    if ((cString.count) != 6) {
+        return UIColor.gray
+    }
+
+    var rgbValue:UInt64 = 0
+    Scanner(string: cString).scanHexInt64(&rgbValue)
+
+    return UIColor(
+        red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
+        green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
+        blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
+        alpha: CGFloat(1.0)
+    )
+}
 

@@ -1,8 +1,9 @@
 import { CustomModal } from "src/components/CustomModal";
 import { Image, Text } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { Upload } from "@tamagui/lucide-icons";
 
-import { Button, Fieldset, Input, Label } from "tamagui";
+import { Button, Fieldset, Input, Label, View, XStack } from "tamagui";
 import React from "react";
 import { styles } from "../styles";
 
@@ -91,12 +92,11 @@ const AddNewProject = ({
       title={"Dodaj nowy projekt"}
       body={
         <>
-          <Fieldset gap="$4" horizontal>
+          <Fieldset gap="$1">
             <Label width={160} justifyContent="flex-end" htmlFor="name">
               Nazwa
             </Label>
             <Input
-              flex={1}
               id="name"
               defaultValue=""
               value={newProjectName}
@@ -104,15 +104,27 @@ const AddNewProject = ({
             />
           </Fieldset>
           <Text style={{ color: "red" }}>{nameError}</Text>
-          <Fieldset gap="$4" horizontal>
-            <Label width={160} justifyContent="flex-end" htmlFor="username">
-              {image && (
+          <Fieldset gap="$1" horizontal>
+            {image && (
+              <>
                 <Image source={{ uri: image }} style={styles.uploadThumbnail} />
-              )}
-              <Button onPress={pickImage}>
-                Pick an image from camera roll
-              </Button>
-            </Label>
+                <Button style={{ margin: 20 }} width="75%" onPress={pickImage}>
+                  Wgraj miniaturkę
+                </Button>
+              </>
+            )}
+            {!image && (
+              <>
+                <Upload margin={"$3"} size={"$4"} />
+                <Button
+                  style={{ margin: 20 }}
+                  width={"75%"}
+                  onPress={pickImage}
+                >
+                  Wgraj miniaturkę
+                </Button>
+              </>
+            )}
           </Fieldset>
           <Text style={{ color: "red" }}>{imageError}</Text>
         </>

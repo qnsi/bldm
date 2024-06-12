@@ -47,9 +47,8 @@ export const styles = StyleSheet.create({
     borderRadius: 5,
   },
   uploadThumbnail: {
-    marginRight: 50,
-    height: 50,
-    width: 50,
+    height: 75,
+    width: 75,
     borderRadius: 10,
   },
   projects: {

@@ -139,12 +139,11 @@ const AddNewTeam = ({
       title={"Dodaj nowy zespol"}
       body={
         <>
-          <Fieldset gap="$4" horizontal>
-            <Label width={160} justifyContent="flex-end" htmlFor="name">
+          <Fieldset gap="$1">
+            <Label justifyContent="flex-end" htmlFor="name">
               Nazwa
             </Label>
             <Input
-              flex={1}
               id="name"
               defaultValue=""
               value={newTeamName}

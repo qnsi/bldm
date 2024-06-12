@@ -8,11 +8,13 @@ import React from "react";
 import { useGetInvitationLink } from "../api";
 
 export const ProjectsHeader = ({
+  isPrimaryOwner,
   workspaceAccountId,
   deleteWorkspace,
   dropdownVisible,
   setDropdownVisible,
 }: {
+  isPrimaryOwner: boolean;
   workspaceAccountId: string;
   deleteWorkspace: () => void;
   dropdownVisible: boolean;
@@ -31,41 +33,45 @@ export const ProjectsHeader = ({
             onPress={() => supabase.auth.signOut()}
             text={"Sign out"}
           />
-          <CustomModal
-            trigger={
-              <DropdownElement
-                onPress={() => { }}
-                text={"Dodaj do zespołu"}
-              ></DropdownElement>
-            }
-            title={"Dodaj osoby do zespolu"}
-            body={
-              <>
-                <Text>{invitationLink}</Text>
-                <Button
-                  onPress={() => Clipboard.setStringAsync(invitationLink)}
-                >
-                  Skopiuj link
-                </Button>
-              </>
-            }
-            downButtons={<></>}
-          />
-          <CustomModal
-            trigger={
-              <DropdownElement
-                onPress={() => { }}
-                text={"Usun zespol"}
-              ></DropdownElement>
-            }
-            title={"Czy na pewno chcesz usunac zespol?"}
-            body={
-              <>
-                <Button onPress={deleteWorkspace}>Usun zespol</Button>
-              </>
-            }
-            downButtons={<></>}
-          />
+          {isPrimaryOwner && (
+            <>
+              <CustomModal
+                trigger={
+                  <DropdownElement
+                    onPress={() => { }}
+                    text={"Dodaj do zespołu"}
+                  ></DropdownElement>
+                }
+                title={"Dodaj osoby do zespolu"}
+                body={
+                  <>
+                    <Text>{invitationLink}</Text>
+                    <Button
+                      onPress={() => Clipboard.setStringAsync(invitationLink)}
+                    >
+                      Skopiuj link
+                    </Button>
+                  </>
+                }
+                downButtons={<></>}
+              />
+              <CustomModal
+                trigger={
+                  <DropdownElement
+                    onPress={() => { }}
+                    text={"Usun zespol"}
+                  ></DropdownElement>
+                }
+                title={"Czy na pewno chcesz usunac zespol?"}
+                body={
+                  <>
+                    <Button onPress={deleteWorkspace}>Usun zespol</Button>
+                  </>
+                }
+                downButtons={<></>}
+              />
+            </>
+          )}
         </>
       }
     />
