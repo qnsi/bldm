@@ -19,7 +19,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
     private var label: UILabel!
     private var fileUrlString: String = ""
     private var pdfView = PDFView()
-    var statePins: [CGPoint] = []
+    var statePins: [Pin] = []
     private var renderedPageWidth: CGFloat = 0
     private var renderedPageHeight: CGFloat = 0
     let onAddPin = EventDispatcher()
@@ -107,7 +107,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
         //       label.text = text
     }
 
-    func updatePins(with pins: [CGPoint]) {
+    func updatePins(with pins: [Pin]) {
         // Clean previous circles
         if (pdfView.document != nil) {
             guard let pdfPage = pdfView.currentPage else { return }
@@ -122,32 +122,41 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
                 let circleBounds = CGRect(x: originalX-10, y: originalY-10, width: 20, height: 20)
                 let circleAnnotation = PDFAnnotation(bounds: circleBounds, forType: .circle, withProperties: nil)
 
-                // switch pin.layer_id {
-                //     case 0:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#ff5f5b")
-                //     case 1:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#ffa13d")
-                //     case 2:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#ffdd4f")
-                //     case 3:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#aff026")
-                //     case 4:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#3effd2")
-                //     case 5:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#738dfd")
-                //     case 6:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#414dfd")
-                //     case 7:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#953cb9")
-                //     case 8:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#a92c7a")
-                //     case 9:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#ff5f5b")
-                //     case 9:
-                //         circleAnnotation.color = hexStringToUIColor(hex: "#dbdbdb")
-                // }
+
+                var layerColor: UIColor
+                var opacity: CGFloat = 1
+                if (pin.isDone) {
+                    opacity = 0.5
+                }
+                switch pin.layer_id {
+                    case 0:
+                        layerColor = hexStringToUIColor(hex: "#ff5f5b")
+                    case 1:
+                        layerColor = hexStringToUIColor(hex: "#ffa13d")
+                    case 2:
+                        layerColor = hexStringToUIColor(hex: "#ffdd4f")
+                    case 3:
+                        layerColor = hexStringToUIColor(hex: "#aff026")
+                    case 4:
+                        layerColor = hexStringToUIColor(hex: "#3effd2")
+                    case 5:
+                        layerColor = hexStringToUIColor(hex: "#738dfd")
+                    case 6:
+                        layerColor = hexStringToUIColor(hex: "#414dfd")
+                    case 7:
+                        layerColor = hexStringToUIColor(hex: "#953cb9")
+                    case 8:
+                        layerColor = hexStringToUIColor(hex: "#a92c7a")
+                    case 9:
+                        layerColor = hexStringToUIColor(hex: "#dbdbdb")
+                    default: 
+                        layerColor = hexStringToUIColor(hex: "#dbdbdb")
+                }
+
+                layerColor = layerColor.withAlphaComponent(opacity)
                 
-                circleAnnotation.color = .red
+                circleAnnotation.color = layerColor
+                circleAnnotation.interiorColor = layerColor
                 circleAnnotation.border = PDFBorder()
                 circleAnnotation.border?.lineWidth = 2
                 

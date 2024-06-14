@@ -1,10 +1,11 @@
 import ExpoModulesCore
 
 struct Pin {
-    var x: Double
-    var y: Double
+  let x: CGFloat
+  let y: CGFloat
+  let layer_id: NSNumber
+  let isDone: Bool
 }
-
 
 public class ExpoPdfViewerModule: Module {
   // Each module class must implement the definition function. The definition consists of components
@@ -47,13 +48,21 @@ public class ExpoPdfViewerModule: Module {
         print("Updating file source: " + prop)
         view.updateFileSource(with: prop)
       }
-      Prop("pins") { (view: ExpoPdfViewer, pins: [CGPoint]) in
-        view.statePins = pins
-        let pinDescriptions = pins.map { pin in
-          return "(\(pin.x), \(pin.y))"
+      Prop("pins") { (view: ExpoPdfViewer, pins: [[String: Any]]) in
+          let parsedPins = pins.map { pinDict -> Pin in
+              let x = pinDict["x"] as? CGFloat ?? 0
+              let y = pinDict["y"] as? CGFloat ?? 0
+              let layer_id = pinDict["layer_id"] as? NSNumber ?? 0
+              let isDone = pinDict["isDone"] as? Bool ?? false
+              return Pin(x: x, y: y, layer_id: layer_id, isDone: isDone)
+          }
+        view.statePins = parsedPins
+
+        let pinDescriptions = parsedPins.map { pin in
+          return "(\(pin.x), \(pin.y), \(pin.layer_id))"
         }.joined(separator: ", ")
         print("pins prop changed: [\(pinDescriptions)]")
-        view.updatePins(with: pins)
+        view.updatePins(with: parsedPins)
       }
     }
     //     // Now trigger the PDF update in the view

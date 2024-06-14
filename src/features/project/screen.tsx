@@ -69,7 +69,7 @@ export default function ProjectScreen({ route, navigation }) {
     setIsVisible(true);
   };
 
-  const addNewPin = (taskName, note, isDone) => {
+  const addNewPin = (taskName, note, isDone, selectedLayerId) => {
     if (!newPin) return;
     supabase
       .from("pins")
@@ -98,11 +98,13 @@ export default function ProjectScreen({ route, navigation }) {
     taskName: string,
     note: string,
     isDone: boolean,
+    layerId: number,
   ) => {
     console.log("updatePin, pinId: ", pinId);
     console.log("updatePin, taskName: ", taskName);
     console.log("updatePin, note: ", note);
     console.log("updatePin, isDone: ", isDone);
+    console.log("updatePin, layerId: ", layerId);
     supabase
       .from("pins")
       .update([
@@ -110,6 +112,7 @@ export default function ProjectScreen({ route, navigation }) {
           task_name: taskName,
           note,
           is_done: isDone,
+          layer_id: layerId,
         },
       ])
       .eq("id", pinId)
@@ -244,6 +247,8 @@ export default function ProjectScreen({ route, navigation }) {
             />
           )}
           <AddNewPinModal
+            autoSelectedLayerId={selectedLayerId}
+            layers={layers}
             isVisible={isVisible}
             onClose={onClose}
             addNewPin={addNewPin}
@@ -252,6 +257,7 @@ export default function ProjectScreen({ route, navigation }) {
             isVisible={editingPinVisible}
             pinId={editingPinId}
             pins={pins}
+            layers={layers}
             onClose={onClose}
             updatePin={updatePin}
           />
