@@ -66,6 +66,7 @@ export default function ProjectScreen({ route, navigation }) {
     const x = event.nativeEvent.data.x;
     const y = event.nativeEvent.data.y;
     setNewPin({ x, y });
+    setPins((pins) => pins.concat([{ x, y } as Pin]));
     setIsVisible(true);
   };
 

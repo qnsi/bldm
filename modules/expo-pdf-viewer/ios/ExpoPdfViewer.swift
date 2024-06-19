@@ -2,16 +2,6 @@ import ExpoModulesCore
 import UIKit
 import PDFKit
 
-// class CustomPDFView: PDFView {
-//     override func addGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
-//         if gestureRecognizer is UILongPressGestureRecognizer {
-//             // Prevent adding the default long press gesture recognizer
-//             // Optionally, you can also tweak the recognizer's properties here if you don't want to completely disable it
-//             gestureRecognizer.isEnabled = false
-//         }
-//         super.addGestureRecognizer(gestureRecognizer)
-//     }
-// }
 
 // This view will be used as a native component. Make sure to inherit from `ExpoView`
 // to apply the proper styling (e.g. border radius and shadows).
@@ -30,11 +20,16 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
     pdfView.translatesAutoresizingMaskIntoConstraints = false
     self.addSubview(pdfView)
 
+
+
 // Constraints for the pdfView to fill the entire view
     pdfView.leadingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.leadingAnchor).isActive = true
     pdfView.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor).isActive = true
     pdfView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor).isActive = true
     pdfView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor).isActive = true
+
+    // allow bigger zoom
+    pdfView.maxScaleFactor = 10.0;
 
     print("fileUrlString")
     print(fileUrlString)

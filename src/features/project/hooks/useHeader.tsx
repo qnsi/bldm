@@ -4,6 +4,8 @@ import { supabase } from "src/utils/supabase";
 import { Project } from "../../projects/model";
 import { Workspace } from "../../teams/Workspaces/models";
 import { useQueryClient } from "@tanstack/react-query";
+import { CustomModal } from "src/components/CustomModal";
+import { Button } from "tamagui";
 
 export const useHeader = (
   navigation,
@@ -65,7 +67,21 @@ export const useHeader = (
               onPress={() => supabase.auth.signOut()}
               text={"Sign out"}
             />
-            <DropdownElement onPress={removeProject} text={"Remove Project"} />
+            <CustomModal
+              trigger={
+                <DropdownElement
+                  onPress={() => {}}
+                  text={"Usun projekt"}
+                ></DropdownElement>
+              }
+              title={"Czy na pewno chcesz usunąć projekt?"}
+              body={
+                <>
+                  <Button onPress={removeProject}>Usuń projekt</Button>
+                </>
+              }
+              downButtons={<></>}
+            />
           </>
         }
       />
