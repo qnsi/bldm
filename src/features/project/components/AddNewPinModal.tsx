@@ -47,7 +47,7 @@ export const AddNewPinModal = ({
           key="content"
           animateOnly={["transform", "opacity"]}
           animation={[
-            "quicker",
+            "lazy",
             {
               opacity: {
                 overshootClamping: true,

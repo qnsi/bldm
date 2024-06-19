@@ -7,11 +7,14 @@ import { Layer, Pin } from "../models";
 import { Dialog, Button, Unspaced } from "tamagui";
 import { X } from "@tamagui/lucide-icons";
 import { SelectLayer } from "./SelectLayer";
+import { colors } from "src/styles/colors";
+import { CustomModal } from "src/components/CustomModal";
 
 export const EditPinModal = ({
   isVisible,
   onClose,
   updatePin,
+  deletePin,
   pinId,
   pins,
   layers,
@@ -27,11 +30,13 @@ export const EditPinModal = ({
     isDone: any,
     layerId: number,
   ) => void;
+  deletepin: (pinId: number) => void;
   layers: Layer[];
 }) => {
   const [taskName, setTaskName] = React.useState("");
   const [note, setNote] = React.useState("");
   const [isDone, setIsDone] = React.useState(false);
+  const [isConfirmationOpen, setIsConfirmationOpen] = React.useState(false);
   const [selectedLayerId, setSelectedLayerId] = React.useState(0);
   const toggleSwitch = () => setIsDone((previousState) => !previousState);
 
@@ -54,6 +59,16 @@ export const EditPinModal = ({
     setIsDone(false);
     setSelectedLayerId(0);
   };
+
+  const handleDeletePin = () => {
+    setIsConfirmationOpen(false);
+    deletePin(pinId);
+    setTaskName("");
+    setNote("");
+    setIsDone(false);
+    setSelectedLayerId(0);
+  };
+
   return (
     <Dialog modal open={isVisible} onOpenChange={onClose}>
       <Dialog.Portal>
@@ -71,7 +86,7 @@ export const EditPinModal = ({
           key="content"
           animateOnly={["transform", "opacity"]}
           animation={[
-            "quicker",
+            "medium",
             {
               opacity: {
                 overshootClamping: true,
@@ -79,7 +94,7 @@ export const EditPinModal = ({
             },
           ]}
           enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
-          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+          // exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
           gap="$4"
         >
           <Dialog.Title>Edytuj zadanie</Dialog.Title>
@@ -111,7 +126,24 @@ export const EditPinModal = ({
               value={isDone}
             />
           </View>
-          <Button onPress={save}>Zapisz</Button>
+          <Button
+            style={{ backgroundColor: colors.action, color: "#fff" }}
+            onPress={save}
+          >
+            Zapisz
+          </Button>
+          <CustomModal
+            isOpen={isConfirmationOpen}
+            onOpenChange={(isOpen) => setIsConfirmationOpen(isOpen)}
+            trigger={<Button>Usuń zadanie</Button>}
+            title={"Czy na pewno chcesz usunąć zadanie?"}
+            body={
+              <>
+                <Button onPress={handleDeletePin}>Usuń zadanie</Button>
+              </>
+            }
+            downButtons={<></>}
+          />
           <Unspaced>
             <Dialog.Close asChild>
               <Button

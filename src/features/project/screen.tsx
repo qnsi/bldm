@@ -124,6 +124,19 @@ export default function ProjectScreen({ route, navigation }) {
     setEditingPinVisible(false);
   };
 
+  const deletePin = (pinId: number) => {
+    console.log("deletePin, pinId: ", pinId);
+    supabase
+      .from("pins")
+      .delete()
+      .eq("id", pinId)
+      .then((result) => {
+        console.log("Delete result: ", result);
+        fetchPins();
+      });
+    setEditingPinVisible(false);
+  };
+
   const clickPin = (event) => {
     console.log("removePin, event: ", event.nativeEvent);
     const x = event.nativeEvent.data.x;
@@ -136,6 +149,7 @@ export default function ProjectScreen({ route, navigation }) {
   };
 
   const onClose = () => {
+    setPins((pins) => pins.filter((pin) => pin.id));
     setIsVisible(false);
     setEditingPinVisible(false);
   };
@@ -261,6 +275,7 @@ export default function ProjectScreen({ route, navigation }) {
             layers={layers}
             onClose={onClose}
             updatePin={updatePin}
+            deletePin={deletePin}
           />
         </>
       )}

@@ -76,6 +76,9 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             let mappedY = 1000 - ((locationOnPage.y / renderedPageHeight) * 1000)
                 
                 for pin in statePins {
+                    if pin.id == 0 {
+                        continue
+                    }
                     print("pin.x", pin.x)
                     print("pin.y", pin.y)
                     let distance = sqrt(

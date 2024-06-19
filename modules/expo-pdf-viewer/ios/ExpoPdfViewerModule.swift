@@ -5,6 +5,7 @@ struct Pin {
   let y: CGFloat
   let layer_id: NSNumber
   let isDone: Bool
+  let id: NSNumber
 }
 
 public class ExpoPdfViewerModule: Module {
@@ -53,8 +54,9 @@ public class ExpoPdfViewerModule: Module {
               let x = pinDict["x"] as? CGFloat ?? 0
               let y = pinDict["y"] as? CGFloat ?? 0
               let layer_id = pinDict["layer_id"] as? NSNumber ?? 0
+              let id = pinDict["id"] as? NSNumber ?? 0
               let isDone = pinDict["isDone"] as? Bool ?? false
-              return Pin(x: x, y: y, layer_id: layer_id, isDone: isDone)
+              return Pin(x: x, y: y, layer_id: layer_id, isDone: isDone, id: id)
           }
         view.statePins = parsedPins
 
