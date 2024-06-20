@@ -22,6 +22,10 @@ export const AddNewPinModal = ({
     React.useState(autoSelectedLayerId);
   const selectedLayer = layers.find((layer) => layer.id === selectedLayerId);
 
+  React.useEffect(() => {
+    setSelectedLayerId(autoSelectedLayerId);
+  }, [autoSelectedLayerId]);
+
   const toggleSwitch = () => setIsDone((previousState) => !previousState);
 
   const save = () => {

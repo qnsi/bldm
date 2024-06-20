@@ -2,18 +2,119 @@ import ExpoModulesCore
 import UIKit
 import PDFKit
 
+class MyPDFView: PDFView, UIEditMenuInteractionDelegate {
+    private var customMenu: UIMenu?
+    private var interaction: UIEditMenuInteraction?
+    private var canShowMenu = true
+    
+    private var configuration: UIEditMenuConfiguration? {
+        if let selection = currentSelection,
+           let currentPage = currentPage {
+            let bounds = selection.bounds(for: currentPage)
+            let point = convert(CGPoint(x: bounds.midX, y: bounds.maxY), from: currentPage)
+            let configuration = UIEditMenuConfiguration(identifier: "MSMenu", sourcePoint: point)
+            return configuration
+        }
+        return nil
+    }
+    
+    init() {
+        super.init(frame: .zero)
+        autoScales = true
+        setValue(true, forKey: "forcesTopAlignment")
+        let interaction = UIEditMenuInteraction(delegate: self)
+        self.interaction = interaction
+        addInteraction(interaction)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func buildMenu(with builder: UIMenuBuilder) {
+        if canShowMenu, let configuration = self.configuration {
+            canShowMenu = false
+            customMenu = builder.menu(for: .standardEdit)
+            DispatchQueue.main.async { [weak self] in
+                self?.showMenu(for: configuration)
+            }
+        }
+    }
+    
+    private func showMenu(for configuration: UIEditMenuConfiguration) {
+        interaction?.presentEditMenu(with: configuration)
+        canShowMenu = true
+    }
+    
+    func editMenuInteraction(_ interaction: UIEditMenuInteraction, menuFor configuration: UIEditMenuConfiguration, suggestedActions: [UIMenuElement]) -> UIMenu? {
+        customMenu
+    }
+    // oLD
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        self.currentSelection = nil
+        self.clearSelection()
+
+        return false
+    }
+
+    func modAddGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
+        super.addGestureRecognizer(gestureRecognizer)
+    }
+
+    override func addGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
+        if gestureRecognizer is UILongPressGestureRecognizer {
+            gestureRecognizer.isEnabled = false
+        }
+
+        super.addGestureRecognizer(gestureRecognizer)
+    }
+
+    func allSubViewsOf<T: UIView>(type: T.Type) -> [T] {
+        var all: [T] = []
+        func getSubview(view: UIView) {
+            if let aView = view as? T {
+                all.append(aView)
+            }
+            guard view.subviews.count > 0 else { return }
+            view.subviews.forEach{ getSubview(view: $0) }
+        }
+        getSubview(view: self)
+        return all
+    }
+
+}
+
 
 // This view will be used as a native component. Make sure to inherit from `ExpoView`
 // to apply the proper styling (e.g. border radius and shadows).
 class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
     private var label: UILabel!
     private var fileUrlString: String = ""
-    private var pdfView = PDFView()
+    private var pdfView = MyPDFView()
     var statePins: [Pin] = []
     private var renderedPageWidth: CGFloat = 0
     private var renderedPageHeight: CGFloat = 0
     let onAddPin = EventDispatcher()
     let onClickPin = EventDispatcher()
+
+    func recursivelyDisableSelection(view: UIView) {
+        
+        // Get all recognizers for the PDFView's subviews. Here we are ignoring the recognizers for the PDFView itself, since we know from testing that not the reason for the mess.
+        for rec in view.subviews.compactMap({$0.gestureRecognizers}).flatMap({$0}) {
+            // UITapAndAHalfRecognizer is for a gesture like "tap first, then tap again and drag", this gesture also enable's text selection
+            if rec is UILongPressGestureRecognizer || type(of: rec).description() == "UITapAndAHalfRecognizer" {
+                rec.isEnabled = false
+            }
+        }
+        
+        // For all subviews, if they do have subview in itself, disable the above 2 gestures as well.
+        for view in view.subviews {
+            if !view.subviews.isEmpty {
+                recursivelyDisableSelection(view: view)
+            }
+        }
+    }
+
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -31,6 +132,14 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
     // allow bigger zoom
     pdfView.maxScaleFactor = 10.0;
 
+    // clean Text Selection
+    // let allSubviews = pdfView.allSubViewsOf(type: UIView.self)
+    // for gestureRec in allSubviews.compactMap({ $0.gestureRecognizers }).flatMap({ $0 }) {
+    //     if gestureRec is UILongPressGestureRecognizer {
+    //         gestureRec.isEnabled = false
+    //     }
+    // }
+
     print("fileUrlString")
     print(fileUrlString)
     if let url = URL(string: fileUrlString) {
@@ -40,9 +149,15 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             print("Got document")
             print(document)
             pdfView.document = document
+            recursivelyDisableSelection(view: pdfView)
+            NotificationCenter.default.addObserver(self, selector: #selector(pageChanged), name: .PDFViewVisiblePagesChanged, object: nil)
         }
     }
   }
+
+  @objc func pageChanged() {
+    recursivelyDisableSelection(view: pdfView)
+}
 
   @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         print("handleLongPress triggered")
@@ -74,6 +189,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             let locationOnPage = pdfView.convert(locationInView, to: page)
             let mappedX = (locationOnPage.x / renderedPageWidth) * 1000
             let mappedY = 1000 - ((locationOnPage.y / renderedPageHeight) * 1000)
+            var clickedPins: [Pin] = []
                 
                 for pin in statePins {
                     if pin.id == 0 {
@@ -89,7 +205,8 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
                     if distance < 40 {
                         print("Triggering onClickPin")
                         print("typeof(onClickPin)", type(of: self.onClickPin))
-                        self.onClickPin(["data": ["x": pin.x, "y": pin.y]])
+                        clickedPins.append(pin)
+                        // self.onClickPin(["data": ["x": pin.x, "y": pin.y]])
                     }
                 }
                 
@@ -97,6 +214,8 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
                 // Here, you can handle the tap as needed
                 print("Single tap at page coordinates: \(locationOnPage)")
                 // Example: Add annotation or perform other actions
+                let mappedClickedPins = clickedPins.map { ["x": $0.x, "y": $0.y] }
+                self.onClickPin(["data": mappedClickedPins])
             }
         }
     }
@@ -187,7 +306,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
             print("Adding long press gesture recognizer")
             let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
             longPressRecognizer.delegate = self
-            pdfView.addGestureRecognizer(longPressRecognizer)
+            pdfView.modAddGestureRecognizer(longPressRecognizer)
             
             print("Adding singleTap gesture recognizer")
             let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleSingleTap(_:)))
@@ -234,5 +353,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
         blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
         alpha: CGFloat(1.0)
     )
+
+
 }
 

@@ -18,6 +18,7 @@ export const EditPinModal = ({
   pinId,
   pins,
   layers,
+  handleAddNewPinInSamePlace,
 }: {
   isVisible: boolean;
   onClose: () => void;
@@ -30,7 +31,8 @@ export const EditPinModal = ({
     isDone: any,
     layerId: number,
   ) => void;
-  deletepin: (pinId: number) => void;
+  deletePin: (pinId: number) => void;
+  handleAddNewPinInSamePlace: (pin: Pin) => void;
   layers: Layer[];
 }) => {
   const [taskName, setTaskName] = React.useState("");
@@ -39,6 +41,8 @@ export const EditPinModal = ({
   const [isConfirmationOpen, setIsConfirmationOpen] = React.useState(false);
   const [selectedLayerId, setSelectedLayerId] = React.useState(0);
   const toggleSwitch = () => setIsDone((previousState) => !previousState);
+
+  const pin = pins.find((pin) => pin.id === pinId);
 
   useEffect(() => {
     const pin = pins.find((pin) => pin.id === pinId);
@@ -74,26 +78,26 @@ export const EditPinModal = ({
       <Dialog.Portal>
         <Dialog.Overlay
           key="overlay"
-          animation="slow"
+          // animation="medium"
           opacity={0.5}
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
+          // enterStyle={{ opacity: 0 }}
+          // exitStyle={{ opacity: 0 }}
         />
 
         <Dialog.Content
           bordered
           elevate
           key="content"
-          animateOnly={["transform", "opacity"]}
-          animation={[
-            "medium",
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+          // animateOnly={["transform", "opacity"]}
+          // animation={[
+          //   "medium",
+          //   {
+          //     opacity: {
+          //       overshootClamping: true,
+          //     },
+          //   },
+          // ]}
+          // enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
           // exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
           gap="$4"
         >
@@ -144,6 +148,9 @@ export const EditPinModal = ({
             }
             downButtons={<></>}
           />
+          <Button onPress={() => handleAddNewPinInSamePlace(pin)}>
+            Dodaj zadanie w tym samym miejscu
+          </Button>
           <Unspaced>
             <Dialog.Close asChild>
               <Button

@@ -18,6 +18,7 @@ import { ToggleDone } from "./components/ToggleDone";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Spinner, XStack, YStack } from "tamagui";
 import { styles } from "./styles";
+import { MultiplePinsModal } from "./components/MultiplePinsModal";
 
 export default function ProjectScreen({ route, navigation }) {
   const project = route.params.project as Project;
@@ -28,6 +29,11 @@ export default function ProjectScreen({ route, navigation }) {
   const [isVisible, setIsVisible] = React.useState(false);
   const [newPin, setNewPin] = React.useState<{ x: number; y: number }>();
   const [editingPinId, setEditingPinId] = React.useState(0);
+  const [multipleEditingPinsIds, setMultipleEditingPinsIds] = React.useState<
+    number[]
+  >([]);
+  const [multipleEditingPinsVisible, setMultipleEditingPinsVisible] =
+    React.useState(false);
   const [editingPinVisible, setEditingPinVisible] = React.useState(false);
   const [showDone, setShowDone] = React.useState(true);
   const [hackKey, setHackKey] = React.useState(0);
@@ -66,7 +72,20 @@ export default function ProjectScreen({ route, navigation }) {
     const x = event.nativeEvent.data.x;
     const y = event.nativeEvent.data.y;
     setNewPin({ x, y });
-    setPins((pins) => pins.concat([{ x, y } as Pin]));
+    setPins((pins) =>
+      pins.concat([{ x, y, layer_id: selectedLayerId } as Pin]),
+    );
+    setIsVisible(true);
+  };
+
+  const handleAddNewPinInSamePlace = (pin: Pin) => {
+    setEditingPinVisible(false);
+    const x = pin.x;
+    const y = pin.y;
+    setNewPin({ x, y });
+    setPins((pins) =>
+      pins.concat([{ x, y, layer_id: selectedLayerId } as Pin]),
+    );
     setIsVisible(true);
   };
 
@@ -137,21 +156,44 @@ export default function ProjectScreen({ route, navigation }) {
     setEditingPinVisible(false);
   };
 
+  const clickSinglePin = (pinId: number) => {
+    setMultipleEditingPinsIds([]);
+    setMultipleEditingPinsVisible(false);
+    setEditingPinId(pinId);
+    setEditingPinVisible(true);
+  };
+
   const clickPin = (event) => {
-    console.log("removePin, event: ", event.nativeEvent);
-    const x = event.nativeEvent.data.x;
-    const y = event.nativeEvent.data.y;
-    if (event) {
+    console.log("clickPin, event: ", event.nativeEvent);
+    if (event && event.nativeEvent.data.length > 1) {
+      const clickedPins = event.nativeEvent.data;
+      const intersection = pins.filter((pin) =>
+        clickedPins.some(
+          (clickedPin: Pin) => pin.x === clickedPin.x && pin.y === clickedPin.y,
+        ),
+      );
+      const ids = intersection.map((pin) => pin.id);
+      setMultipleEditingPinsIds(ids);
+      setMultipleEditingPinsVisible(true);
+    } else if (event) {
+      const x = event.nativeEvent.data[0].x;
+      const y = event.nativeEvent.data[0].y;
       console.log("removePin, event: ", event.nativeEvent);
-      setEditingPinId(pins.find((pin) => pin.x == x && pin.y == y)?.id || 0);
-      setEditingPinVisible(true);
+      const pinId = pins.find((pin) => pin.x == x && pin.y == y)?.id || 0;
+      clickSinglePin(pinId);
     }
+    // const x = event.nativeEvent.data.x;
+    // const y = event.nativeEvent.data.y;
+    // if (event) {
+    // }
   };
 
   const onClose = () => {
     setPins((pins) => pins.filter((pin) => pin.id));
     setIsVisible(false);
     setEditingPinVisible(false);
+    setMultipleEditingPinsIds([]);
+    setMultipleEditingPinsVisible(false);
   };
 
   const uploadNewPlan = (name: string, pdfBase64: string) => {
@@ -268,6 +310,14 @@ export default function ProjectScreen({ route, navigation }) {
             onClose={onClose}
             addNewPin={addNewPin}
           />
+          <MultiplePinsModal
+            isVisible={multipleEditingPinsVisible}
+            pinIds={multipleEditingPinsIds}
+            pins={pins}
+            layers={layers}
+            onClose={onClose}
+            clickSinglePin={clickSinglePin}
+          />
           <EditPinModal
             isVisible={editingPinVisible}
             pinId={editingPinId}
@@ -276,6 +326,7 @@ export default function ProjectScreen({ route, navigation }) {
             onClose={onClose}
             updatePin={updatePin}
             deletePin={deletePin}
+            handleAddNewPinInSamePlace={handleAddNewPinInSamePlace}
           />
         </>
       )}
