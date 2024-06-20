@@ -175,7 +175,7 @@ export default function ProjectScreen({ route, navigation }) {
       const ids = intersection.map((pin) => pin.id);
       setMultipleEditingPinsIds(ids);
       setMultipleEditingPinsVisible(true);
-    } else if (event) {
+    } else if (event && event.nativeEvent.data.length == 1) {
       const x = event.nativeEvent.data[0].x;
       const y = event.nativeEvent.data[0].y;
       console.log("removePin, event: ", event.nativeEvent);

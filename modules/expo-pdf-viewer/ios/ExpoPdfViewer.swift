@@ -115,6 +115,77 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
         }
     }
 
+    func distanceBetween(_ pin1: Pin, _ pin2: Pin) -> CGFloat {
+        let dx = pin1.x - pin2.x
+        let dy = pin1.y - pin2.y
+        return sqrt(dx * dx + dy * dy)
+    }
+
+    func distanceBetweenPoints(_ point1: CGPoint, _ point2: CGPoint) -> CGFloat {
+        let dx = point1.x - point2.x
+            let dy = point1.y - point2.y
+            return sqrt(dx * dx + dy * dy)
+    }
+
+    func clusterPins(pins: [Pin], maxDistance: CGFloat) -> [[Pin]] {
+        var clusters: [[Pin]] = []
+            var visited = Set<NSNumber>()
+
+            for pin in pins {
+                if !visited.contains(pin.id) {
+                    var cluster: [Pin] = []
+                        var queue: [Pin] = [pin]
+                        visited.insert(pin.id)
+
+                        while !queue.isEmpty {
+                            let current = queue.removeFirst()
+                                cluster.append(current)
+
+                                for otherPin in pins {
+                                    if !visited.contains(otherPin.id) && distanceBetween(current, otherPin) < maxDistance {
+                                        queue.append(otherPin)
+                                            visited.insert(otherPin.id)
+                                    }
+                                }
+                        }
+                    clusters.append(cluster)
+                }
+            }
+        return clusters
+    }
+
+    func calculateCentroid(of cluster: [Pin]) -> CGPoint {
+        var sumX: CGFloat = 0
+        var sumY: CGFloat = 0
+        
+        for pin in cluster {
+            sumX += pin.x
+            sumY += pin.y
+        }
+        
+        let count = CGFloat(cluster.count)
+        return CGPoint(x: sumX / count, y: sumY / count)
+    }
+
+    func findCenterMostPin(of cluster: [Pin]) -> Pin? {
+        guard !cluster.isEmpty else { return nil }
+
+        let centroid = calculateCentroid(of: cluster)
+            var centerMostPin = cluster[0]
+            var minimumDistance = distanceBetweenPoints(CGPoint(x: centerMostPin.x, y: centerMostPin.y), centroid)
+
+            for pin in cluster {
+                let pinPoint = CGPoint(x: pin.x, y: pin.y)
+                    let distance = distanceBetweenPoints(pinPoint, centroid)
+                    if distance < minimumDistance {
+                        centerMostPin = pin
+                            minimumDistance = distance
+                    }
+            }
+
+        return centerMostPin
+    }
+
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -202,7 +273,7 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
                         pow(Double(mappedY - pin.y), 2.0)
                     )
                     print("distance: ", distance)
-                    if distance < 40 {
+                    if distance < 20 {
                         print("Triggering onClickPin")
                         print("typeof(onClickPin)", type(of: self.onClickPin))
                         clickedPins.append(pin)
@@ -278,6 +349,34 @@ class ExpoPdfViewer: ExpoView, UIGestureRecognizerDelegate {
                 circleAnnotation.border?.lineWidth = 2
                 
                 pdfPage.addAnnotation(circleAnnotation)
+            }
+            let clusters = clusterPins(pins: pins, maxDistance: 20)
+            print("clusters: length")
+            print(clusters.count)
+
+            for cluster in clusters {
+                if cluster.count > 1 {
+                    let centralPin = findCenterMostPin(of: cluster)
+                    guard let centralPin = centralPin else { return }
+
+                    print("centralPin x , y ")
+                    print(centralPin.x, centralPin.y)
+                    print("cluster.count")
+                    print(cluster.count)
+                    let originalX = (centralPin.x / 1000) * renderedPageWidth
+                    let originalY = renderedPageHeight - ((centralPin.y / 1000) * renderedPageHeight)
+                    let textBounds = CGRect(x: originalX-6, y: originalY-7, width: 20, height: 20)
+                    let textAnnotation = PDFAnnotation(bounds: textBounds, forType: .freeText, withProperties: nil)
+                    textAnnotation.contents = String(cluster.count)
+                    textAnnotation.font = UIFont.boldSystemFont(ofSize: 16)
+                    textAnnotation.color = .clear
+                    textAnnotation.interiorColor = .clear
+                    textAnnotation.fontColor = .black
+
+                    // Add the annotation to the PDF page
+                    pdfPage.addAnnotation(textAnnotation)
+                }
+                
             }
         }
     }
